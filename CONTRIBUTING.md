@@ -80,6 +80,10 @@ automatically.
 autocli uses flake8, pylint, and pydocstyle linters. The configuration for
 the linters is found on [setup.cfg](setup.cfg).
 
+The flake8 linter will use the configured linters in the system. The pylint
+linter will add McCabe extension and compute the cyclomatic complexity for
+the code. Both linters are set for a maximum complexity of 10.
+
 ### Testing
 
 Features must be defined using the _Gherkin language_, and steps to test it
