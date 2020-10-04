@@ -31,7 +31,7 @@ Given the CLI description
         description: Someone to greet.
         required: yes
     """
-    And a function "greeting.hello" with an argument "someone" that prints "Hello, {someone}!"
+    And a function "greeting.hello" that prints "Hello, {someone}!"
 When the application is executed with [World]
 Then the output is
     """
@@ -158,7 +158,7 @@ Given the CLI description
         configuration: yes
         optional: yes
     """
-    And a function "greeting.hello" with an argument "someone" that prints "Hello, {someone}!"
+    And a function "greeting.hello" that prints "Hello, {someone}!"
     When the application is executed with [-vvv, World]
     Then the CLI configuration has attribute "verbose" with value 3
     When the application is executed with [-vv, World]

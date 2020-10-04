@@ -61,8 +61,8 @@ def _given_cli_description(context):
     context.cli = AutoCLI(context.cli_description)
 
 
-@given('a function "{func}" with an argument "{arg}" that prints "{strfmt}"')
-def _given_a_function_with_one_arg_that_prints(context, func, arg, strfmt):
+@given('a function "{func}" that prints "{strfmt}"')
+def _given_a_function_with_one_arg_that_prints(context, func, strfmt):
     # pylint: disable=unused-argument
     def side_effect(**kwargs):
         print(strfmt.format(**kwargs))
