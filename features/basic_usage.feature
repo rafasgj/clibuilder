@@ -165,3 +165,112 @@ Given the CLI description
     Then the CLI configuration has attribute "verbose" with value 2
     When the application is executed with [World]
     Then the CLI configuration has attribute "verbose" with value 0
+
+Scenario: Application with an optional positional argument.
+Given the CLI description
+    """
+    ---
+    program: greeting
+    description: A greeting application.
+    version: 1.0
+    handler: greeting.hello
+    arguments:
+      - name: someone
+        description: Someone to greet.
+        required: no
+    """
+When the application is executed with [-h]
+Then the output is
+    """
+    usage: greeting [-h] [--version] [someone]
+
+    A greeting application.
+
+    positional arguments:
+      someone     Someone to greet.
+
+    optional arguments:
+      -h, --help  show this help message and exit
+      --version   display program version
+    """
+
+Scenario: Application with two arguments, one optional.
+Given the CLI description
+    """
+    ---
+    program: greeting
+    description: A greeting application.
+    version: 1.0
+    handler: greeting.hello
+    arguments:
+      - name: greet
+        description: A greeting to someone.
+        required: no
+        default: Hello
+      - name: someone
+        description: Someone to greet.
+        required: yes
+    """
+    And a function "greeting.hello" that prints "{greet}, {someone}!"
+When the application is executed with [--help]
+Then the output is
+    """
+    usage: greeting [-h] [--version] [greet] someone
+
+    A greeting application.
+
+    positional arguments:
+      greet       A greeting to someone.
+      someone     Someone to greet.
+
+    optional arguments:
+      -h, --help  show this help message and exit
+      --version   display program version
+      """
+
+Scenario: Application with two arguments, one optional.
+Given the CLI description
+    """
+    ---
+    program: greeting
+    description: A greeting application.
+    version: 1.0
+    handler: greeting.hello
+    arguments:
+      - name: greet
+        description: A greeting to someone.
+        required: no
+        default: Hello
+      - name: someone
+        description: Someone to greet.
+        required: yes
+    """
+    And a function "greeting.hello" that prints "{greet}, {someone}!"
+When the application is executed with [John]
+Then the output is
+    """
+    Hello, John!
+    """
+Scenario: Application with two arguments, one optional.
+Given the CLI description
+    """
+    ---
+    program: greeting
+    description: A greeting application.
+    version: 1.0
+    handler: greeting.hello
+    arguments:
+      - name: greet
+        description: A greeting to someone.
+        required: no
+        default: Hello
+      - name: someone
+        description: Someone to greet.
+        required: yes
+    """
+    And a function "greeting.hello" that prints "{greet}, {someone}!"
+When the application is executed with [Goodbye, John]
+Then the output is
+    """
+    Goodbye, John!
+    """
