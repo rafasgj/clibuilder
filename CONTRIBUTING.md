@@ -115,4 +115,17 @@ Then, the commit must have a brief description of the problem being fixed,
 how it was fixed, and what it changes in autocli usage.
 
 If the pull request was created to fix an open issue, include this
-information in a commit message, by adding "Fixes: #<issue number>" to it.
+information in a commit message, by adding "Fix: #<issue number>" to it.
+
+### Development Environment
+
+autocli uses `setup.cfg` to handle dependencies. It is suggested that the
+development dependencies are installed in a virtual environment, with `pip`,
+using an editable install.
+
+```
+python3 -m venv .venv
+. .venv/bin/activate
+pip install --upgrade pip setuptools wheel
+pip install -e .[dev]
+```
