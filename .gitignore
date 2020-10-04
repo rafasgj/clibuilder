@@ -1,0 +1,14 @@
+*.pyc
+
+debug.out
+
+.coverage
+
+/.tox/
+/.venv/
+
+/build/
+/dist/
+/*.egg-info/
+/.eggs/
+
