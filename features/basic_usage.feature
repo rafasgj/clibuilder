@@ -29,7 +29,7 @@ Given the CLI description
     arguments:
       - name: someone
         description: Someone to greet.
-        required: true
+        required: yes
     """
     And a function "greeting.hello" with an argument "someone" that prints "Hello, {someone}!"
 When the application is executed with [World]
@@ -50,7 +50,7 @@ Given the CLI description
     arguments:
       - name: someone
         description: Someone to greet.
-        required: true
+        required: yes
     """
 When the application is executed without prameters
 Then the error output is
@@ -85,7 +85,7 @@ Given the CLI description
     arguments:
       - name: someone
         description: Someone to greet.
-        required: true
+        required: yes
     """
 When the application is executed with [--help]
 Then the output is
