@@ -113,3 +113,9 @@ def _then_exit_code_is(context, exit_code):
 def _when_run_application_with_param(context, param_list):
     params = [p.strip() for p in param_list.split(",")]
     __run_application(context, params)
+
+
+@then('the CLI configuration has attribute "{attribute}" with value {value}')
+def _then_cli_configuration_has_attribute(context, attribute, value):
+    assert hasattr(context.cli.configuration, attribute)
+    assert str(getattr(context.cli.configuration, attribute)) == value

@@ -102,3 +102,66 @@ Then the output is
       --version   display program version
     """
     And the exit code is 0
+
+Scenario: Help for application with a "count" argument, used for configuration.
+Given the CLI description
+    """
+    ---
+    program: greeting
+    description: A greeting application.
+    version: 1.0
+    handler: greeting.hello
+    arguments:
+      - name: someone
+        description: Someone to greet.
+        required: yes
+      - name: verbose
+        abbrev: v
+        description: increase verbosity
+        type: count
+        parameter: false
+        optional: yes
+    """
+When the application is executed with [--help]
+Then the output is
+    """
+    usage: greeting [-h] [--version] [--verbose] someone
+
+    A greeting application.
+
+    positional arguments:
+      someone        Someone to greet.
+
+    optional arguments:
+      -h, --help     show this help message and exit
+      --version      display program version
+      --verbose, -v  increase verbosity
+    """
+    And the exit code is 0
+
+Scenario: Application with a "count" argument, used for configuration.
+Given the CLI description
+    """
+    ---
+    program: greeting
+    description: A greeting application.
+    version: 1.0
+    handler: greeting.hello
+    arguments:
+      - name: someone
+        description: Someone to greet.
+        required: yes
+      - name: verbose
+        abbrev: v
+        description: increase verbosity
+        type: count
+        configuration: yes
+        optional: yes
+    """
+    And a function "greeting.hello" with an argument "someone" that prints "Hello, {someone}!"
+    When the application is executed with [-vvv, World]
+    Then the CLI configuration has attribute "verbose" with value 3
+    When the application is executed with [-vv, World]
+    Then the CLI configuration has attribute "verbose" with value 2
+    When the application is executed with [World]
+    Then the CLI configuration has attribute "verbose" with value 0

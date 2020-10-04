@@ -17,8 +17,13 @@
 
 """autocli implementation."""
 
+import re
 from argparse import ArgumentParser
 import importlib
+
+
+class Object:  # pylint: disable=too-few-public-methods
+    """Used to add attributes on demand."""
 
 
 class AutoCLI:
@@ -43,6 +48,8 @@ class AutoCLI:
                 version=f"%(prog)s {self.__version}",
             )
         self.__commands = {f"{self.__program}": cli_description.get("handler")}
+        self.configuration = Object()
+        self.__non_parameters = []
 
         for argument in cli_description.get("arguments", []):
             self.__add_argument(self.__argparse, argument)
@@ -51,6 +58,11 @@ class AutoCLI:
         """Execute the CLI application."""
         options = self.__argparse.parse_args(argv)
         args = vars(options)
+        self.configuration = Object()
+        for cfg in self.__non_parameters:
+            if cfg in args:
+                setattr(self.configuration, cfg, args[cfg])
+                del args[cfg]
 
         if hasattr(options, "_cli_command"):
             # pylint: disable=protected-access
@@ -72,24 +84,51 @@ class AutoCLI:
         handler(**args)
 
     def __add_argument(self, parser, argument):
-        # pylint: disable=no-self-use
-        flag = "flag" in argument
-        if flag:
-            if "name" in argument:
-                raise Exception("Only one of `name` or `flag` can be used.")
-        else:
-            if "abbrev" in argument:
-                raise Exception("Cannot use `abbrev` with `name`.")
-        names = [
-            argument[i] for i in ["flag", "abbrev", "name"] if i in argument
-        ]
+        default = argument.get("default")
+        arg_type = {
+            "count": (int, "count", 0),
+            "int": (int, "store"),
+            "integer": (int, "store"),
+            "str": (str, "store"),
+            "string": (str, "store"),
+            "float": (float, "store"),
+            "boolean": (bool, "store_true" if default else "store_false"),
+        }
+        extra_args = {}
+
         description = argument["description"]
         required = argument.get("required", False)
+        optional = argument.get("optional")
 
-        extra_args = {}
-        if flag:
+        if "type" in argument:
+            datatype, action, *default = arg_type.get(
+                argument["type"], (str, "store")
+            )
+        else:
+            action = "store"
+            datatype = str
+
+        extra_args["action"] = action
+        if default:
+            extra_args["default"] = datatype(*default)
+
+        if optional:
+            names = [f"--{argument['name']}"]
+            if "abbrev" in argument:
+                names.append(f"-{argument['abbrev']}")
             extra_args["required"] = required
         else:
-            if not required:
-                extra_args["nargs"] = "?"
+            if "abbrev" in argument:
+                raise Exception("Cannot use `abbrev` without `optional: yes`.")
+            if argument.get("type", "string") not in ["bool", "boolean"]:
+                if not required:
+                    extra_args["nargs"] = "?"
+            extra_args["type"] = datatype
+            names = [argument["name"]]
+
+        if argument.get("configuration"):
+            self.__non_parameters.append(
+                names[0][re.search(r"[^-]", names[0]).start() :]
+            )
+
         parser.add_argument(*names, help=description, **extra_args)
