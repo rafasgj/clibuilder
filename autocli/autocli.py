@@ -100,8 +100,9 @@ class AutoCLI:
         required = argument.get("required", False)
         optional = argument.get("optional")
 
+        type_default = None
         if "type" in argument:
-            datatype, action, *default = arg_type.get(
+            datatype, action, *type_default = arg_type.get(
                 argument["type"], (str, "store")
             )
         else:
@@ -109,8 +110,10 @@ class AutoCLI:
             datatype = str
 
         extra_args["action"] = action
-        if default:
-            extra_args["default"] = datatype(*default)
+        if type_default:
+            extra_args["default"] = datatype(*type_default)
+        if default is not None:
+            extra_args["default"] = datatype(default)
 
         if optional:
             names = [f"--{argument['name']}"]
