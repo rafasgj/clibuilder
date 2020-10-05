@@ -34,23 +34,23 @@ class AutoCLI:
     def __init__(self, cli_description):
         """Initialize framework with the provided description."""
         self.__description = cli_description
-        self.__program = cli_description["program"]
+        program = cli_description["program"]
         description = cli_description["description"]
-        self.__version = str(cli_description.get("version"))
-        self.__argparse = ArgumentParser(
-            prog=self.__program, description=description
-        )
-        if self.__version:
+        self.__argparse = ArgumentParser(prog=program, description=description)
+        if "version" in cli_description:
             self.__argparse.add_argument(
                 "--version",
                 action="version",
                 help="display program version",
-                version=f"%(prog)s {self.__version}",
+                version=f"%(prog)s {cli_description['version']}",
             )
-        self.__commands = {f"{self.__program}": cli_description.get("handler")}
+        handler = cli_description.get("handler")
+        self.__commands = {f"{program}": handler}
         self.configuration = Object()
         self.__non_parameters = []
-
+        self.__output = {}
+        if handler:
+            self.__output[handler] = cli_description.get("output")
         for argument in cli_description.get("arguments", []):
             self.__add_argument(self.__argparse, argument)
 
@@ -69,19 +69,31 @@ class AutoCLI:
             method_name = options._cli_command
             del args[method_name]
         else:
-            method_name = self.__program
+            method_name = self.__description["program"]
         if not method_name:
             raise Exception("Method name not defined.")
         if method_name not in self.__commands:
             raise Exception(f"Invalid command: {method_name}.")
 
         method_name = self.__commands[method_name]
+        output = self.__output[method_name]
 
         # execute function
         *module, function = method_name.split(".")
         mod = importlib.import_module(".".join(module))
         handler = getattr(mod, function)
-        handler(**args)
+        result = handler(**args)
+        if output:
+            if isinstance(result, dict):
+                if isinstance(output, dict):
+                    print(output["format"].format(**result))
+                if isinstance(output, str):
+                    print(output.format(**result))
+                else:
+                    self.display(result)
+            else:
+                self.display(result)
+        return result
 
     def __add_argument(self, parser, argument):
         default = argument.get("default")
@@ -100,14 +112,11 @@ class AutoCLI:
         required = argument.get("required", False)
         optional = argument.get("optional")
 
-        type_default = None
-        if "type" in argument:
-            datatype, action, *type_default = arg_type.get(
-                argument["type"], (str, "store")
-            )
-        else:
-            action = "store"
-            datatype = str
+        datatype, action, *type_default = (
+            arg_type.get(argument["type"], (str, "store"))
+            if "type" in argument
+            else (str, "store", None)
+        )
 
         extra_args["action"] = action
         if type_default:
@@ -129,9 +138,44 @@ class AutoCLI:
             extra_args["type"] = datatype
             names = [argument["name"]]
 
+        if "nargs" in argument:
+            extra_args["nargs"] = argument["nargs"]
+
         if argument.get("configuration"):
             self.__non_parameters.append(
                 names[0][re.search(r"[^-]", names[0]).start() :]
             )
 
         parser.add_argument(*names, help=description, **extra_args)
+
+    @staticmethod
+    def __display_dict(data, level=0):
+        """Display the result of the API command."""
+        if isinstance(data, dict):
+            for key, value in data.items():
+                if isinstance(value, dict):
+                    print("%s%s:" % (" " * (4 * level), key))
+                    AutoCLI.__display_dict(value, level + 1)
+                elif isinstance(value, list):
+                    print("%s%s:" % (" " * (4 * level), key))
+                    for item in value:
+                        print("%s- %s" % (" " * 4 * (level + 1), item))
+                else:
+                    print("%s%s: %s" % (" " * (4 * level), key, value))
+        elif isinstance(data, list):
+            for entry in data:
+                AutoCLI.__display_dict(entry)
+                print("---")
+        else:
+            print(repr(data))
+
+    @staticmethod
+    def display(data):
+        """Display, on the terminal, the `data` object."""
+        if isinstance(data, (list, tuple)):
+            for line in data:
+                print(line)
+        elif isinstance(data, dict):
+            AutoCLI.__display_dict(data)
+        else:
+            print(data)

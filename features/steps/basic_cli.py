@@ -63,7 +63,6 @@ def _given_cli_description(context):
 
 @given('a function "{func}" that prints "{strfmt}"')
 def _given_a_function_with_one_arg_that_prints(context, func, strfmt):
-    # pylint: disable=unused-argument
     def side_effect(**kwargs):
         print(strfmt.format(**kwargs))
 
@@ -119,3 +118,15 @@ def _when_run_application_with_param(context, param_list):
 def _then_cli_configuration_has_attribute(context, attribute, value):
     assert hasattr(context.cli.configuration, attribute)
     assert str(getattr(context.cli.configuration, attribute)) == value
+
+
+@given('a function "{func}"')
+def _given_a_function(context, func):
+    def side_effect(**kwargs):
+        return kwargs
+
+    *module, function = func.split(".")
+    context.mock_fun = MagicMock(
+        **{function: MagicMock(side_effect=side_effect)}
+    )
+    sys.modules[".".join(module)] = context.mock_fun
