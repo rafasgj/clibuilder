@@ -149,13 +149,13 @@ class AutoCLI:
         parser.add_argument(*names, help=description, **extra_args)
 
     @staticmethod
-    def __display_dict(data, level=0):
+    def display(data, level=0):
         """Display the result of the API command."""
         if isinstance(data, dict):
             for key, value in data.items():
                 if isinstance(value, dict):
                     print("%s%s:" % (" " * (4 * level), key))
-                    AutoCLI.__display_dict(value, level + 1)
+                    AutoCLI.display(value, level + 1)
                 elif isinstance(value, list):
                     print("%s%s:" % (" " * (4 * level), key))
                     for item in value:
@@ -164,18 +164,7 @@ class AutoCLI:
                     print("%s%s: %s" % (" " * (4 * level), key, value))
         elif isinstance(data, list):
             for entry in data:
-                AutoCLI.__display_dict(entry)
+                AutoCLI.display(entry, level)
                 print("---")
         else:
             print(repr(data))
-
-    @staticmethod
-    def display(data):
-        """Display, on the terminal, the `data` object."""
-        if isinstance(data, (list, tuple)):
-            for line in data:
-                print(line)
-        elif isinstance(data, dict):
-            AutoCLI.__display_dict(data)
-        else:
-            print(data)
