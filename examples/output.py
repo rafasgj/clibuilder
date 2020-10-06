@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
 
-"""autocli example: Greeting application."""
+"""autocli example: application with a formated output."""
 
 import yaml
 
