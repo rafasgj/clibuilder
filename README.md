@@ -8,8 +8,12 @@ The goal is to create a framework to build the command line interface only
 using configuration files (YAML or JSON format), and minimizing the need to
 write code for it.
 
-For example, to create a simple "Greeting" application, the CLI definition
-file, should look like:
+
+Usage
+-----
+
+To create a simple "Greeting" application, the CLI definition file, should
+look like:
 
 ```yaml
 ---
@@ -18,7 +22,7 @@ description: A greeting application.
 version: 1.0
 handler: greeting.hello
 arguments:
-  someone:
+  - name: someone
     description: Someone to greet.
     type: string
     required: true
@@ -27,7 +31,9 @@ arguments:
 And the application code would be:
 
 ```python
-from autocli.autocli import AutoCLI
+# Contents of greeting.py
+
+from autocli import AutoCLI
 
 def hello(someone):
     print(f"Hello, {someone}!")
@@ -37,9 +43,9 @@ if __name__ == "__main__":
     cli.run()
 ```
 
-With this setup, the application will have options to display its version
-(--version), help instructions (-h or --help), and a required positional
-argument. If run with `--help`, the output is:
+With this configuration, the application will have options to display its
+version (--version), help instructions (-h or --help), and a required
+positional argument. If run with `--help`, the output is:
 
 ```
 usage: greeting [-h] [--version] someone
@@ -67,4 +73,96 @@ would be:
 
 ```
 Hello, World!
+```
+
+You may also use `autocli` to automatically format the output returned by
+the handler methods. Use the `output` attribute along with the handler
+method to configure the output format.
+
+The next example configures the output format, with a formatting string,
+that follows Python's formatting rules.
+
+```yaml
+---
+program: output
+description: Auto-formatting output.
+version: 1.0
+handler: output.hello
+output:
+  format: "Hello, {someone}"
+arguments:
+  - name: someone
+    description: Someone to greet.
+    required: true
+```
+
+And the code for this application would be:
+
+```python
+# contents of output.py.
+
+from autocli import AutoCLI
+
+
+def hello(someone):
+    """Greet someone."""
+    return {"someone": someone}
+
+
+if __name__ == "__main__":
+    cli = AutoCLI.from_file('output.yaml'))
+    cli.run()
+```
+
+Applications with multiple commands and command groups (like `git`) are
+supported through `sub_commands`. Each `command` in `sub_command` can have
+its own `sub_command`, creating a command hierarchy (deep hierarchies are
+not recommended).
+
+The configuration for such application would be:
+
+```yaml
+---
+program: multi
+description: A multi-command application.
+version: 1.0
+sub_commands:
+  title: Commands
+  description: Application sub-commands
+  group_name: Sub commands
+  commands:
+    - name: abc
+      description: First command.
+      handler: multi.abc
+      arguments:
+      - name: some_arg
+        description: Some argument.
+    - name: xyz
+      description: Second command.
+      handler: multi.xyz
+      arguments:
+      - name: another_arg
+        description: Another argument.
+```
+
+And the client code:
+
+```python
+# contents of multi.py
+
+from autocli import AutoCLI
+
+def abc(some_arg):
+    """Greet someone."""
+    print(f"ABC: {some_arg}")
+
+
+def xyz(another_arg):
+    """Greet someone."""
+    print(f"XYZ: {another_arg}")
+
+
+if __name__ == "__main__":
+    cli = AutoCLI.from_file("multi.yml")
+    cli.run()
 ```
