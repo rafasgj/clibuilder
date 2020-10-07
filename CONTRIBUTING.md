@@ -32,7 +32,8 @@ When reporting a new bug, be clear on the problem you reporting, and include:
 The more complete and accurate information, the easier it is to understand,
 find and fix the problem.
 
-Once the bug is filled, it will be triaged, and labelled as `bug`.
+Once the bug is filled, it will be triaged, and labelled as `bug`, if it
+will be fixed.
 
 
 Requesting Features
@@ -95,8 +96,11 @@ and configuration to capture and evaluate the output on each stream are
 provided. Use the tags `@stdout` and `@stderr` on your features or scenarios
 to enable them.
 
+`behave` is used to test expected behavior. To test corner cases, or negative
+(i.e. exceptions) behavior, [pytest](https;//pytest.org) is used.
+
 Bugs must have tests that reproduce the issue to be fixed, these tests are
-implemented using [pytest](https;//pytest.org).
+implemented using `pytest`.
 
 To execute all code tests (linters and tests), [Tox](https://tox.readthedocs.io)
 is used. A configuration for it is provided in [setup.cfg](setup.cfg), along
