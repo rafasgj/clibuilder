@@ -19,7 +19,7 @@
 
 import yaml
 
-from autocli.autocli import AutoCLI
+from autocli import AutoCLI
 
 __CLI_CONFIGURATION = """
 ---
