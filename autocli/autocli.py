@@ -44,15 +44,41 @@ class AutoCLI:
                 help="display program version",
                 version=f"%(prog)s {cli_description['version']}",
             )
-        handler = cli_description.get("handler")
-        self.__commands = {f"{program}": handler}
+
         self.configuration = Object()
         self.__non_parameters = []
         self.__output = {}
+        self.__commands = {}
+        self.__add_group(None, self.__argparse, program, cli_description)
+
+    def __add_group(self, subparser, parser, command, cmd_description):
+        handler = cmd_description.get("handler")
         if handler:
-            self.__output[handler] = cli_description.get("output")
-        for argument in cli_description.get("arguments", []):
-            self.__add_argument(self.__argparse, argument)
+            self.__commands[f"{command}"] = handler
+            self.__output[handler] = cmd_description.get("output")
+
+        for argument in cmd_description.get("arguments", []):
+            self.__add_argument(parser, argument)
+
+        sub_commands = cmd_description.get("sub_commands", {})
+
+        if sub_commands:
+            sub_parser_args = {}
+            for item in ["title", "description"]:
+                if item in sub_commands:
+                    sub_parser_args[item] = sub_commands[item]
+            if "group_name" in sub_commands:
+                sub_parser_args["metavar"] = sub_commands["group_name"]
+            subparser = parser.add_subparsers(
+                dest="_cli_command", **sub_parser_args
+            )
+            for cmd_group in sub_commands.get("commands"):
+                new_parser = subparser.add_parser(
+                    cmd_group["name"], help=cmd_group["description"]
+                )
+                self.__add_group(
+                    subparser, new_parser, cmd_group["name"], cmd_group
+                )
 
     def run(self, argv=None):
         """Execute the CLI application."""
@@ -67,7 +93,7 @@ class AutoCLI:
         if hasattr(options, "_cli_command"):
             # pylint: disable=protected-access
             method_name = options._cli_command
-            del args[method_name]
+            del args["_cli_command"]
         else:
             method_name = self.__description["program"]
         if not method_name:
