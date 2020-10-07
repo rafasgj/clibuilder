@@ -274,3 +274,23 @@ Then the output is
     """
     Goodbye, John!
     """
+
+Scenario: Application CLI description in a file.
+Given the the CLI description from the file "greeting.yml"
+    """
+    ---
+    program: greeting
+    description: A greeting application.
+    version: 1.0
+    handler: greeting.hello
+    arguments:
+      - name: someone
+        description: Someone to greet.
+        required: yes
+    """
+    And a function "greeting.hello" that prints "Hello, {someone}!"
+When the application is executed with [World]
+Then the output is
+    """
+    Hello, World!
+    """

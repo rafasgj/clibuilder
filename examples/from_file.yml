@@ -1,0 +1,9 @@
+---
+program: greeting
+description: A greeting application.
+version: 1.0
+handler: from_file.hello
+arguments:
+  - name: someone
+    description: Someone to greet.
+    required: yes

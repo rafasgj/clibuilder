@@ -19,7 +19,7 @@
 
 import sys
 import io
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch, mock_open
 import yaml
 
 # pylint: disable=import-error, no-name-in-module
@@ -130,3 +130,14 @@ def _given_a_function(context, func):
         **{function: MagicMock(side_effect=side_effect)}
     )
     sys.modules[".".join(module)] = context.mock_fun
+
+
+@given('the the CLI description from the file "{filename}"')
+def _given_cli_as_file(context, filename):
+    try:
+        with patch("builtins.open", mock_open(read_data=context.text)):
+            context.cli = AutoCLI.from_file(filename)
+    except Exception as error:  # pylint: disable=broad-except
+        context.exception = error
+    else:
+        context.exception = None

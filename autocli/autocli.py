@@ -21,6 +21,11 @@ import re
 from argparse import ArgumentParser
 import importlib
 
+try:
+    import yaml
+except ImportError:
+    pass
+
 
 class Object:  # pylint: disable=too-few-public-methods
     """Used to add attributes on demand."""
@@ -29,7 +34,10 @@ class Object:  # pylint: disable=too-few-public-methods
 class AutoCLI:
     """Framework for CLI application creation."""
 
-    # pylint: disable=too-few-public-methods
+    @classmethod
+    def from_file(cls, filename):
+        with open(filename, "r") as cli_description:
+            return cls(yaml.safe_load(cli_description.read()))
 
     def __init__(self, cli_description):
         """Initialize framework with the provided description."""
