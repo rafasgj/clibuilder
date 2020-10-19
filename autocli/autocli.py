@@ -36,6 +36,7 @@ class AutoCLI:
 
     @classmethod
     def from_file(cls, filename):
+        """Load the CLI configuration from a YAML or JSON file."""
         with open(filename, "r") as cli_description:
             return cls(yaml.safe_load(cli_description.read()))
 
