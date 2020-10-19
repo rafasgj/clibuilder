@@ -1,4 +1,4 @@
-# This file is part of autocli
+# This file is part of clidesc
 #
 # Copyright (C) 2020 Rafael Guterres Jeffman
 #
@@ -15,6 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Initialize autocli module."""
+"""Initialize clidesc module."""
 
-from .autocli import AutoCLI  # noqa: F401
+from .clidesc import CLIDesc  # noqa: F401

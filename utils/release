@@ -1,0 +1,44 @@
+#!/bin/sh
+
+dir=`dirname $0`
+filename=`mktemp`
+
+version=`cat "${dir}/../version.txt"`
+MAJOR=`echo "${version}" | cut -d. -f1`
+MINOR=`echo "${version}" | cut -d. -f2`
+PATCH=`echo "${version}" | cut -d. -f3`
+
+"${dir}/gittochangelog" "v${version}" > "${filename}"
+
+
+if [ "$1" == "-M" ]
+then
+  MAJOR=$[$MAJOR + 1]
+  MINOR=0
+  PATCH=0
+elif [ "$1" == "-p" ]
+then
+  PATCH=$[$PATCH + 1]
+else
+  MINOR=$[$MINOR + 1]
+fi
+
+release="${MAJOR}.${MINOR}.${PATCH}"
+echo "${release}" > "${dir}/../version.txt"
+
+git add "${dir}/../version.txt"
+git commit -m "Update version for release."
+
+git tag -a "v${release}" -eF "${filename}"
+
+echo "Updating repository."
+git push --all origin main
+
+python3 -m pip install --user --upgrade setuptools wheel
+python3 -m pip install --user --upgrade twine
+python3 setup.py sdist bdist_wheel
+
+python3 -m twine upload dist/clidesc-${realease}*
+
+rm "${filename}"
+

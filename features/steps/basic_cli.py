@@ -1,4 +1,4 @@
-# This file is part of autocli
+# This file is part of clidesc
 #
 # Copyright (C) 2020 Rafael Guterres Jeffman
 #
@@ -25,7 +25,7 @@ import yaml
 # pylint: disable=import-error, no-name-in-module
 from behave import given, when, then
 
-from autocli import AutoCLI
+from clidesc import CLIDesc
 
 
 def __run_application(context, params=None):
@@ -56,9 +56,9 @@ def __compare_output(expected, observed):
 
 @given("the CLI description")
 def _given_cli_description(context):
-    """Create AutoCLI from YAML/JSON text data."""
+    """Create clidesc from YAML/JSON text data."""
     context.cli_description = yaml.safe_load(context.text)
-    context.cli = AutoCLI(context.cli_description)
+    context.cli = CLIDesc(context.cli_description)
 
 
 @given('a function "{func}" that prints "{strfmt}"')
@@ -136,7 +136,7 @@ def _given_a_function(context, func):
 def _given_cli_as_file(context, filename):
     try:
         with patch("builtins.open", mock_open(read_data=context.text)):
-            context.cli = AutoCLI.from_file(filename)
+            context.cli = CLIDesc.from_file(filename)
     except Exception as error:  # pylint: disable=broad-except
         context.exception = error
     else:

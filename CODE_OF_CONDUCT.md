@@ -1,4 +1,4 @@
-# autocli Code of Conduct
+# clidesc Code of Conduct
 
 ## Our Pledge
 

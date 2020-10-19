@@ -1,4 +1,4 @@
-# This file is part of autocli
+# This file is part of clidesc
 #
 # Copyright (C) 2020 Rafael Guterres Jeffman
 #
@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
 
-"""autocli example: Greeting application."""
+"""clidesc example: Greeting application."""
 
 import yaml
 
-from autocli import AutoCLI
+from clidesc import CLIDesc
 
 __CLI_CONFIGURATION = """
 ---
@@ -40,5 +40,5 @@ def hello(someone):
 
 
 if __name__ == "__main__":
-    cli = AutoCLI(yaml.safe_load(__CLI_CONFIGURATION))
+    cli = CLIDesc(yaml.safe_load(__CLI_CONFIGURATION))
     cli.run()

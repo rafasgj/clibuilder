@@ -1,8 +1,8 @@
-autocli
+clidesc
 =======
 
-`autocli` is a CLI interface framework that can be used to build simple, yet
-functional, command line interfaces with minimal client code.
+`clidesc` is a CLI interface framework that can be used to build simple,
+yet functional, command line interfaces with minimal client code.
 
 The goal is to create a framework to build the command line interface only
 using configuration files (YAML or JSON format), and minimizing the need to
@@ -33,13 +33,13 @@ And the application code would be:
 ```python
 # Contents of greeting.py
 
-from autocli import AutoCLI
+from clidesc import CLIDesc
 
 def hello(someone):
     print(f"Hello, {someone}!")
 
 if __name__ == "__main__":
-    cli = AutoCLI.from_file("greeting.yml")
+    cli = CLIDesc.from_file("greeting.yml")
     cli.run()
 ```
 
@@ -75,7 +75,7 @@ would be:
 Hello, World!
 ```
 
-You may also use `autocli` to automatically format the output returned by
+You may also use `clidesc` to automatically format the output returned by
 the handler methods. Use the `output` attribute along with the handler
 method to configure the output format.
 
@@ -101,7 +101,7 @@ And the code for this application would be:
 ```python
 # contents of output.py.
 
-from autocli import AutoCLI
+from clidesc import CLIDesc
 
 
 def hello(someone):
@@ -110,7 +110,7 @@ def hello(someone):
 
 
 if __name__ == "__main__":
-    cli = AutoCLI.from_file('output.yaml'))
+    cli = CLIDesc.from_file('output.yaml'))
     cli.run()
 ```
 
@@ -150,7 +150,7 @@ And the client code:
 ```python
 # contents of multi.py
 
-from autocli import AutoCLI
+from clidesc import CLIDesc
 
 def abc(some_arg):
     """Greet someone."""
@@ -163,6 +163,6 @@ def xyz(another_arg):
 
 
 if __name__ == "__main__":
-    cli = AutoCLI.from_file("multi.yml")
+    cli = CLIDesc.from_file("multi.yml")
     cli.run()
 ```

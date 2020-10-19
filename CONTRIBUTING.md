@@ -1,19 +1,19 @@
-Contributing to autocli
+Contributing to clidesc
 =======================
 
-Thank you for taking time to contribute to autocli!
+Thank you for taking time to contribute to clidesc!
 
-These are the guidelines for contributing to autocli, it is not a book of
+These are the guidelines for contributing to clidesc, it is not a book of
 rules. Use your best judgment, and feel free to purpose changes to this document.
 
-autocli is hosted on [Github](https://github.com) and most of the time,
+clidesc is hosted on [Github](https://github.com) and most of the time,
 you will be using one of Github's features to make a contribution to the
-project, in [autocli repository](https://github.com/rafasgj/autocli).
+project, in [clidesc repository](https://github.com/rafasgj/clidesc).
 
 Reporting Bugs
 --------------
 
-We use [issues in Github](https://github.com/rafasgj/autocli/issues), to
+We use [issues in Github](https://github.com/rafasgj/clidesc/issues), to
 track open bugs. Before reporting a bug, look at the open issues, to see
 if the bug has not been reported, yet. If it is, we suggest commenting on
 the open issue, which will _upvote_ the issue, by showing that more people
@@ -21,7 +21,7 @@ is being affected by the problem.
 
 When reporting a new bug, be clear on the problem you reporting, and include:
 
-* Version for autocli, Python and operating system;
+* Version for clidesc, Python and operating system;
 * A clear description of the problem;
 * A clear description of what you were trying to achieve;
 * The expected result, and the result observed;
@@ -41,7 +41,7 @@ Requesting Features
 
 Features are actually very similar to bugs, but they are functionality that
 is missing, while bugs are functions that misbehave. Features are also
-reported as [issues in Github](https://github.com/rafasgj/autocli/issues).
+reported as [issues in Github](https://github.com/rafasgj/clidesc/issues).
 
 A new feature might be a new functionality or an enhancement over an
 existing functionality. Before requesting a feature search the open issues
@@ -71,14 +71,14 @@ Once you are willing to contribute code, you must follow a few rules:
 
 ### Code Formatting
 
-autocli uses `black` for code formatting. The only configuration needed is
+clidesc uses `black` for code formatting. The only configuration needed is
 setting up line length to 80 (`-l 80`). If using an editor like Atom or
 VSCode, it is suggested that the editor is configured to format with `black`
 automatically.
 
 ### Linters
 
-autocli uses flake8, pylint, and pydocstyle linters. The configuration for
+clidesc uses flake8, pylint, and pydocstyle linters. The configuration for
 the linters is found on [setup.cfg](setup.cfg).
 
 The flake8 linter will use the configured linters in the system. The pylint
@@ -114,20 +114,20 @@ code.
 ### Pull Requests
 
 To have your code merged to the project repository, you must create a
-[pull request on github](https://github.com/rafasgj/autocli/pulls). The
+[pull request on github](https://github.com/rafasgj/clidesc/pulls). The
 pull request will then be reviewed and when approved, it will be merged.
 
 Each commit on the pull request must have a brief description using
 present tense and imperative mood, with, at most, 72 characters.
 Then, the commit must have a brief description of the problem being fixed,
-how it was fixed, and what it changes in autocli usage.
+how it was fixed, and what it changes in clidesc usage.
 
 If the pull request was created to fix an open issue, include this
 information in a commit message, by adding "Fix: #<issue number>" to it.
 
 ### Development Environment
 
-autocli uses `setup.cfg` to handle dependencies. It is suggested that the
+clidesc uses `setup.cfg` to handle dependencies. It is suggested that the
 development dependencies are installed in a virtual environment, with `pip`,
 using an editable install.
 

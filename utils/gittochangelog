@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ -z "$1" ]
+then
+    entries=`git log --pretty=%an:%s --first-parent`
+else
+    entries=`git log "$1"..HEAD --pretty=%an:%s --first-parent`
+fi
+
+echo "Changes:"
+echo "$entries" | cut -d: -f2 | sed "s/\(.*\)/    \1/"
+echo
+echo "Contributors to this release:"
+echo "$entries" | cut -d: -f1 | sort | uniq | sed "s/\(.*\)/    \1/"

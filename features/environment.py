@@ -1,4 +1,4 @@
-# This file is part of autocli
+# This file is part of clidesc
 #
 # Copyright (C) 2020 Rafael Guterres Jeffman
 #

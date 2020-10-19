@@ -1,4 +1,4 @@
-# This file is part of autocli
+# This file is part of clidesc
 #
 # Copyright (C) 2020 Rafael Guterres Jeffman
 #
@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
 
-"""autocli implementation."""
+"""clidesc implementation."""
 
 import re
 from argparse import ArgumentParser
@@ -31,7 +31,7 @@ class Object:  # pylint: disable=too-few-public-methods
     """Used to add attributes on demand."""
 
 
-class AutoCLI:
+class CLIDesc:
     """Framework for CLI application creation."""
 
     @classmethod
@@ -183,14 +183,14 @@ class AutoCLI:
 
         parser.add_argument(*names, help=description, **extra_args)
 
-    @staticmethod
-    def display(data, level=0):
+    @classmethod
+    def display(cls, data, level=0):
         """Display the result of the API command."""
         if isinstance(data, dict):
             for key, value in data.items():
                 if isinstance(value, dict):
                     print("%s%s:" % (" " * (4 * level), key))
-                    AutoCLI.display(value, level + 1)
+                    cls.display(value, level + 1)
                 elif isinstance(value, list):
                     print("%s%s:" % (" " * (4 * level), key))
                     for item in value:
@@ -199,7 +199,7 @@ class AutoCLI:
                     print("%s%s: %s" % (" " * (4 * level), key, value))
         elif isinstance(data, list):
             for entry in data:
-                AutoCLI.display(entry, level)
+                cls.display(entry, level)
                 print("---")
         else:
             print(repr(data))
