@@ -1,5 +1,7 @@
 #!/bin/sh
 
+project="clidesc"
+
 usage() {
 cat << EOF
 usage: release [-h] [-p|-M]
@@ -30,13 +32,12 @@ fi
 dir=`dirname $0`
 filename=`mktemp`
 
-version=`cat "${dir}/../version.txt"`
+version_file="${dir}/../${project}/__init__.py"
+version=`sed -n "s/__version__ = \"\([^\"]*\).*/\1/p" < "${version_file}"`
+
 MAJOR=`echo "${version}" | cut -d. -f1`
 MINOR=`echo "${version}" | cut -d. -f2`
 PATCH=`echo "${version}" | cut -d. -f3`
-
-"${dir}/gittochangelog" "v${version}" > "${filename}"
-
 
 if [ "$1" == "-M" ]
 then
@@ -51,22 +52,35 @@ else
   PATCH=0
 fi
 
+# check python virtual environment
+VENV=`echo "import sys; print('yes' if hasattr(sys, 'real_prefix') or sys.base_prefix != sys.prefix else 'no')" | python3`
+USER="--user"
+[ "${VENV}" == "yes" ] && USER=""
+
+# prepare release
 release="${MAJOR}.${MINOR}.${PATCH}"
-echo "${release}" > "${dir}/../version.txt"
+sed -i -e "/__version__/s/.*/__version__ = \"${release}\"/" "${version_file}"
 
-git add "${dir}/../version.txt"
-git commit -m "Update version for release."
+# build
+python3 setup.py sdist bdist_egg
 
+cat <<EOF > "${filename}"
+${project} release version ${release}
+EOF
+
+"${dir}/gittochangelog" "v${version}" >> "${filename}"
+
+# Git release
+git add "${dir}/../clidesc/__init__.py"
+git commit -m "Bumped version for release ${release}."
 git tag -a "v${release}" -eF "${filename}"
 
+# Push to github
 echo "Updating repository."
-git push --all origin main
+git push --tags origin main
 
-python3 -m pip install --user --upgrade setuptools wheel
-python3 -m pip install --user --upgrade twine
-python3 setup.py sdist bdist_wheel
+# Push to pypi
+python3 -m twine upload dist/${project}-${realease}*
 
-python3 -m twine upload dist/clidesc-${realease}*
-
+# cleanup
 rm "${filename}"
-

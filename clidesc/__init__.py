@@ -18,3 +18,6 @@
 """Initialize clidesc module."""
 
 from .clidesc import CLIDesc  # noqa: F401
+
+# Use `utils/release` to change version.
+__version__ = "0.2.1"
