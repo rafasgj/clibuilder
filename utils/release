@@ -48,6 +48,7 @@ then
   PATCH=$[$PATCH + 1]
 else
   MINOR=$[$MINOR + 1]
+  PATCH=0
 fi
 
 release="${MAJOR}.${MINOR}.${PATCH}"
