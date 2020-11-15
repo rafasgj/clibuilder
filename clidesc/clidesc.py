@@ -202,4 +202,8 @@ class CLIDesc:
                 cls.display(entry, level)
                 print("---")
         else:
-            print(repr(data))
+            if data:
+                if isinstance(data, str):
+                    print(data)
+                else:
+                    print(repr(data))
