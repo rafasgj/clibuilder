@@ -23,7 +23,7 @@ import importlib
 
 try:
     import yaml
-except ImportError:
+except ImportError:  # pragma: no cover
     pass
 
 
