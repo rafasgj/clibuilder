@@ -155,7 +155,7 @@ class CLIDesc:
 
         extra_args["action"] = action
         if type_default:
-            extra_args["default"] = datatype(*type_default)
+            extra_args["default"] = type_default[0]
         if default is not None:
             extra_args["default"] = datatype(default)
 
