@@ -20,4 +20,4 @@
 from .clidesc import CLIDesc  # noqa: F401
 
 # Use `utils/release` to change version.
-__version__ = "0.3.0"
+__version__ = "0.4.0"
