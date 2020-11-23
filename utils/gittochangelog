@@ -8,7 +8,7 @@ else
 fi
 
 echo "Changes:"
-echo "$entries" | cut -d: -f2 | sed "s/\(.*\)/    \1/"
+echo "$entries" | cut -d: -f2- | sed "s/\(.*\)/    \1/"
 echo
 echo "Contributors to this release:"
 echo "$entries" | cut -d: -f1 | sort | uniq | sed "s/\(.*\)/    \1/"
