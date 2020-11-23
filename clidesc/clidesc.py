@@ -170,8 +170,10 @@ class CLIDesc:
             if argument.get("type", "string") not in ["bool", "boolean"]:
                 if not required:
                     extra_args["nargs"] = "?"
-            extra_args["type"] = datatype
             names = [argument["name"]]
+
+        if argument.get("type") not in ["count", "bool", "boolean"]:
+            extra_args["type"] = datatype
 
         if "nargs" in argument:
             extra_args["nargs"] = argument["nargs"]
