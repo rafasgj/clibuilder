@@ -139,7 +139,8 @@ class CLIDesc:
             "str": (str, "store"),
             "string": (str, "store"),
             "float": (float, "store"),
-            "boolean": (bool, "store_true" if default else "store_false"),
+            "boolean": (bool, "store_false" if default else "store_true"),
+            "bool": (bool, "store_false" if default else "store_true"),
         }
         extra_args = {}
 
