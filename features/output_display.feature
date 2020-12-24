@@ -19,69 +19,69 @@
 Feature: Automatic output of command handlers.
 
 Scenario: Simple formatted output.
-Given the CLI description
-    """
-    ---
-    program: greeting
-    description: A greeting application.
-    version: 1.0
-    handler: greeting.hello
-    output: >
-      Hello, {someone}!
-    arguments:
-      - name: someone
-        description: Someone to greet.
-        required: yes
-    """
-    And a function "greeting.hello"
-When the application is executed with [World]
-Then the output is
-    """
-    Hello, World!
-    """
+    Given the CLI description
+        """
+        ---
+        program: greeting
+        description: A greeting application.
+        version: 1.0
+        handler: greeting.hello
+        output: >
+          Hello, {someone}!
+        arguments:
+          - name: someone
+            description: Someone to greet.
+            required: yes
+        """
+        And a function "greeting.hello"
+    When the application is executed with [World]
+    Then the output is
+        """
+        Hello, World!
+        """
 
 Scenario: Simple unformatted output.
-Given the CLI description
-    """
-    ---
-    program: greeting
-    description: A greeting application.
-    version: 1.0
-    handler: greeting.hello
-    output: yes
-    arguments:
-      - name: someone
-        description: Someone to greet.
-        required: yes
-    """
-    And a function "greeting.hello"
-When the application is executed with [John]
-Then the output is
-    """
-    someone: John
-    """
+    Given the CLI description
+        """
+        ---
+        program: greeting
+        description: A greeting application.
+        version: 1.0
+        handler: greeting.hello
+        output: yes
+        arguments:
+          - name: someone
+            description: Someone to greet.
+            required: yes
+        """
+        And a function "greeting.hello"
+    When the application is executed with [John]
+    Then the output is
+        """
+        someone: John
+        """
 
 Scenario: Output of a list of values.
-Given the CLI description
-    """
-    ---
-    program: greeting
-    description: A greeting application.
-    version: 1.0
-    handler: greeting.hello
-    output: yes
-    arguments:
-      - name: someone
-        description: Someone to greet.
-        required: yes
-        nargs: +
-    """
-    And a function "greeting.hello"
-When the application is executed with [John, Jack, Jill]
-Then the output is
-    """
-    someone:
-        - John
-        - Jack
-        - Jill
-    """
+    Given the CLI description
+        """
+        ---
+        program: greeting
+        description: A greeting application.
+        version: 1.0
+        handler: greeting.hello
+        output: yes
+        arguments:
+          - name: someone
+            description: Someone to greet.
+            required: yes
+            nargs: +
+        """
+        And a function "greeting.hello"
+    When the application is executed with [John, Jack, Jill]
+    Then the output is
+        """
+        someone:
+            - John
+            - Jack
+            - Jill
+        """
