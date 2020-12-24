@@ -166,3 +166,149 @@ if __name__ == "__main__":
     cli = CLIDesc.from_file("multi.yml")
     cli.run()
 ```
+
+
+Output Formatting
+-----------------
+
+> Note: The output formatting is still a "preview" and might change in the near future. Documentation and testing is far from complete. Check [features/output_display.feature] for tested usage examples.
+
+clidesc allows automatic formatting of the command handlers result. To display the returned values, `output` must be set to `yes`, or provide the format and/or format options.
+
+The default output formatting will depend on the data type that is returned by the command handler. Strings are written as returned, numbers (int, float and complex) follow standard Python output conventions.
+
+Lists, tuples and sets are displayed one item per line, with a "dash" before the item:
+
+```
+- First item
+- Second item
+- Third item
+```
+
+Dictionaries are displayed as `key: value` pairs, but the value will be formatted according to its type, and padded:
+
+```
+a_string: Some text.
+a_list:
+    - an item
+    - another item
+a_dict:
+    a_key: a value
+    another_key:
+        - an inner list
+```
+
+To modify the default display behavior, `output` must be configured. When
+configuring the output formatting, `clidesc` uses Python's
+[Format String Syntax].
+
+For example, if the result of a handler is the dictionary `{someone: John}`,
+and the output is set to `output: Hello, {someone}.`, the output will be
+`"Hello, John."`. The complete configuration for such an application might be (see [examples/output.py]):
+
+```
+---
+program: output
+description: Auto-formatting output.
+version: 1.0
+handler: output.hello
+output: "Hello, {someone}."
+arguments:
+  - name: someone
+    description: Someone to greet.
+    required: true
+```
+
+Lists can be set to be displayed with the item numbers by setting `enumerate` to `yes` (by default, it is `1`):
+
+```
+output:
+   enumerate: yes
+```
+
+Which would result in something like:
+
+```
+users:
+    1. Amy
+    2. Peter
+    3. Jim
+```
+
+To change the base number of the list, set enumerate to the desired value, for example `enumerate: 0` would result in:
+
+```
+users:
+    0. Amy
+    1. Peter
+    2. Jim
+```
+
+The list items can also have its format customized, with a format string. To mimic the `enumerate: yes` configuration, the format sting can be defined as:
+
+```
+output:
+  users: "{_pad}{_index}. {_item}"
+```
+
+This will result in:
+
+```
+users:
+    1. Amy
+    2. Peter
+    3. Jim
+```
+
+It is also possible to hide the `key` using the `no_key` setting:
+
+```
+output:
+  users:
+    no_key: yes
+    format: "{_pad}{_index}. {_item}"
+```
+
+Resulting in the output:
+
+```
+1. Amy
+2. Peter
+3. Jim
+```
+
+The attributes available to configure the output are:
+
+| Name         | Description                            | Default |
+| :----------- | :------------------------------------- | :------ |
+| output       | Set to anything than No or False, will force output. If set to a string, will act as the format string. | No |
+| _field name_ | The name of the field to control output formatting. If set to a string, will act as the format string. | None |
+| format       | The formatting string, can be applied to `output` or to a _field_ | Varies for data type. |
+| no_key       | Hide the display of `keys` in dictionaries, if set to `yes`. | No |
+| enumerate    | If set to `yes` display numbered lists (starting on `1`), if set to an `int`, set the value for the first element of the list. | No |
+| padding      | The amount of _spaces_ to be used for padding for each level of data. Set to 0 or False to disable padding. This attribute must be used with the global `output`, not with a `field`. | 4 |
+
+
+The format string follows the same rules as the Python's [Format String Syntax], and some special attributes are available to aid in formatting output:
+
+| Name      | Description                                        |
+| :-------- | :------------------------------------------------- |
+| _pad      | The current padding for the data to be displayed.  |
+| _key      | The key of the current item.                       |
+| _value    | The value of the current item.                     |
+| _path     | The path to the current item (all of its keys).    |
+| _index    | The index of the current list item.                |
+| _item     | The value of the current list item.                |
+
+> Note: These attributes are available to lists, they might not be available to other data types.
+
+
+Authors
+-------
+
+Rafael Guterres Jeffman <rafasgj@gmail.com>
+
+
+<!-- References -->
+[Format String Syntax]: https://docs.python.org/3/library/string.html#formatstrings
+[examples/output.py]:examples/output.py

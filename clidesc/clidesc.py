@@ -17,6 +17,7 @@
 
 """clidesc implementation."""
 
+import sys
 import re
 from argparse import ArgumentParser
 import importlib
@@ -58,6 +59,7 @@ class CLIDesc:
         self.__non_parameters = []
         self.__output = {}
         self.__commands = {}
+        self.output_stream = sys.stdout
         self.__add_group(None, self.__argparse, program, cli_description)
 
     def __add_group(self, subparser, parser, command, cmd_description):
@@ -119,28 +121,26 @@ class CLIDesc:
         handler = getattr(mod, function)
         result = handler(**args)
         if output:
-            if isinstance(result, dict):
-                if isinstance(output, dict):
-                    print(output["format"].format(**result))
-                if isinstance(output, str):
-                    print(output.format(**result))
-                else:
-                    self.display(result)
-            else:
-                self.display(result)
+            if isinstance(output, bool):
+                output = {}
+            self.__display(result, level=0, format_cfg=output)
         return result
 
     def __add_argument(self, parser, argument):
         default = argument.get("default")
+        store_selector = {
+            True: "store_false",
+            False: "store_true",
+        }
         arg_type = {
-            "count": (int, "count", 0),
+            "count": (int, "count"),
             "int": (int, "store"),
             "integer": (int, "store"),
             "str": (str, "store"),
             "string": (str, "store"),
             "float": (float, "store"),
-            "boolean": (bool, "store_false" if default else "store_true"),
-            "bool": (bool, "store_false" if default else "store_true"),
+            "boolean": (bool, store_selector[bool(default)]),
+            "bool": (bool, store_selector[bool(default)]),
         }
         extra_args = {}
 
@@ -148,17 +148,11 @@ class CLIDesc:
         required = argument.get("required", False)
         optional = argument.get("optional")
 
-        datatype, action, *type_default = (
-            arg_type.get(argument["type"], (str, "store"))
-            if "type" in argument
-            else (str, "store", None)
-        )
+        datatype, action = arg_type.get(argument.get("type", "str"))
 
         extra_args["action"] = action
-        if type_default:
-            extra_args["default"] = type_default[0]
-        if default is not None:
-            extra_args["default"] = datatype(default)
+        if default or action == "count":
+            extra_args["default"] = datatype(default) if default else 0
 
         if optional:
             names = [f"--{argument['name']}"]
@@ -168,9 +162,11 @@ class CLIDesc:
         else:
             if "abbrev" in argument:
                 raise Exception("Cannot use `abbrev` without `optional: yes`.")
-            if argument.get("type", "string") not in ["bool", "boolean"]:
-                if not required:
-                    extra_args["nargs"] = "?"
+            if (
+                argument.get("type", "string") not in ["bool", "boolean"]
+                and not required
+            ):
+                extra_args["nargs"] = "?"
             names = [argument["name"]]
 
         if argument.get("type") not in ["count", "bool", "boolean"]:
@@ -186,27 +182,97 @@ class CLIDesc:
 
         parser.add_argument(*names, help=description, **extra_args)
 
-    @classmethod
-    def display(cls, data, level=0):
+    def __display(self, data, level, format_cfg, parent=None):
         """Display the result of the API command."""
-        if isinstance(data, dict):
-            for key, value in data.items():
-                if isinstance(value, dict):
-                    print("%s%s:" % (" " * (4 * level), key))
-                    cls.display(value, level + 1)
-                elif isinstance(value, list):
-                    print("%s%s:" % (" " * (4 * level), key))
-                    for item in value:
-                        print("%s- %s" % (" " * 4 * (level + 1), item))
-                else:
-                    print("%s%s: %s" % (" " * (4 * level), key, value))
-        elif isinstance(data, list):
-            for entry in data:
-                cls.display(entry, level)
-                print("---")
+        if not isinstance(format_cfg, (str, dict)):
+            raise TypeError("Invalid format type: %s" % type(format).__name__)
+
+        if isinstance(format_cfg, str):
+            print(format_cfg.format(**data), file=self.output_stream)
         else:
-            if data:
-                if isinstance(data, str):
-                    print(data)
+            display_opts = self.__get_display_opts(level, format_cfg, parent)
+            if isinstance(data, (str, int)):
+                print(data, file=self.output_stream)
+            if isinstance(data, (str, int)):
+                print(data, file=self.output_stream)
+            elif isinstance(data, list):
+                self.__display_list(data, display_opts, parent or "")
+            else:
+                for _key, _value in data.items():
+                    _parent = parent.split(".") if parent else []
+                    element = ".".join(_parent + [_key])
+                    _key = self.__get_display_key(format_cfg, _key)
+                    if isinstance(_value, (list, set, dict, tuple)):
+                        print(
+                            f"{display_opts['_pad']}{_key}",
+                            file=self.output_stream,
+                        )
+                        inc = 1 if _key else 0
+                        self.__display(_value, level + inc, format_cfg, element)
+                    else:
+                        print(_key, end=" ", file=self.output_stream)
+                        print(_value, file=self.output_stream)
+
+    @staticmethod
+    def __get_display_key(format_cfg, key):
+        if format_cfg.get("no_key", False):
+            return ""
+        if key in format_cfg:
+            inner = format_cfg[key]
+            if isinstance(inner, dict):
+                if inner.get("no_key", False):
+                    return ""
+        return f"{key}:"
+
+    def __display_list(self, data, display_opts, parent):
+        for _index, _item in enumerate(data):
+            inc = 1
+            _fmt = "{_pad}- {_item}"
+            if "__enumerate" in display_opts:
+                _inc = display_opts["__enumerate"]
+                if isinstance(_inc, bool):
+                    do_fmt = _inc
+                elif isinstance(_inc, int):
+                    do_fmt = True
+                    inc = _inc
                 else:
-                    print(repr(data))
+                    raise TypeError(
+                        "Invalid type for 'enumerate': %s" % type(_inc).__name__
+                    )
+                if do_fmt:
+                    _fmt = "{_pad}{_index}. {_item}"
+            disp_fmt = display_opts.get("__format")
+            _fmt = disp_fmt if disp_fmt else _fmt
+            _key = parent.split(".")[-1] if parent else ""
+            text = _fmt.format(
+                **display_opts,
+                _index=_index + inc,
+                _item=_item,
+                _key=_key,
+                _value=_item,
+                _parent=parent,
+            )
+            print(text, file=self.output_stream)
+
+    @staticmethod
+    def __get_display_opts(level, format_cfg, parent):
+        # get formatting options
+        _fmt = format_cfg
+        _pad_size = _fmt.get("padding", 4)
+        if parent:
+            for _elem in parent.split("."):
+                if _elem in _fmt:
+                    _fmt = _fmt[_elem]
+                else:
+                    break
+            if isinstance(_fmt, str):
+                _fmt = {"format": _fmt}
+
+        display_opts = {
+            "_pad": (" " * (_pad_size * level)) if _pad_size else "",
+            "__format": _fmt.get("format"),
+            "__no_key": _fmt.get("no_key"),
+        }
+        if "enumerate" in _fmt:
+            display_opts["__enumerate"] = _fmt["enumerate"]
+        return display_opts
