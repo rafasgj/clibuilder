@@ -19,13 +19,17 @@
 
 import sys
 import re
+import itertools
 from argparse import ArgumentParser
 import importlib
+import traceback
 
 try:
     import yaml
 except ImportError:  # pragma: no cover
     pass
+
+# pylint: disable=too-many-instance-attributes
 
 
 class Object:  # pylint: disable=too-few-public-methods
@@ -60,6 +64,7 @@ class CLIDesc:
         self.__output = {}
         self.__commands = {}
         self.output_stream = sys.stdout
+        self.exit_code = 0
         self.__add_group(None, self.__argparse, program, cli_description)
 
     def __add_group(self, subparser, parser, command, cmd_description):
@@ -101,30 +106,59 @@ class CLIDesc:
                 setattr(self.configuration, cfg, args[cfg])
                 del args[cfg]
 
-        if hasattr(options, "_cli_command"):
-            # pylint: disable=protected-access
-            method_name = options._cli_command
-            del args["_cli_command"]
-        else:
-            method_name = self.__description["program"]
-        if not method_name:
-            raise Exception("Method name not defined.")
-        if method_name not in self.__commands:
-            raise Exception(f"Invalid command: {method_name}.")
-
-        method_name = self.__commands[method_name]
+        method_name = self.__commands[self.__get_method_name_from(args)]
         output = self.__output[method_name]
 
         # execute function
         *module, function = method_name.split(".")
         mod = importlib.import_module(".".join(module))
         handler = getattr(mod, function)
-        result = handler(**args)
-        if output:
-            if isinstance(output, bool):
-                output = {}
-            self.__display(result, level=0, format_cfg=output)
-        return result
+        try:
+            result = handler(**args)
+        except Exception as exc:  # pylint: disable=broad-except
+            if "exceptions" in self.__description:
+                self.__process_exception(exc, self.__description["exceptions"])
+            raise exc from None
+        else:
+            if output:
+                if isinstance(output, bool):
+                    output = {}
+                self.__display(result, level=0, format_cfg=output)
+            return result
+        return None
+
+    def __get_method_name_from(self, args):
+        method_name = args.get("_cli_command", self.__description["program"])
+        if "_cli_command" in args:
+            del args["_cli_command"]
+        if not method_name:
+            raise Exception("Method name not defined.")
+        if method_name not in self.__commands:
+            raise Exception(f"Invalid command: {method_name}.")
+        return method_name
+
+    def __process_exception(self, exc, exceptions):
+        """Process exception to provide user defined behavior."""
+        exc_names = [n.__name__ for n in type(exc).mro()]
+        exceptions = self.__description["exceptions"]
+        candidates = [
+            y
+            for x, y in itertools.product(exc_names, exceptions)
+            if y["class"] == x
+        ]
+        if not candidates:
+            raise exc from None
+        exception = candidates[0]
+        exit_code = exception.get("exit_code", 0)
+        action = exception.get("action", "abort" if exit_code else "raise")
+        if action == "raise":
+            raise exc from None
+        # if not raising, program will end.
+        error_msg = exception.get("message", "ERROR: {exception}")
+        print(error_msg.format(exception=exc), file=self.output_stream)
+        if action == "traceback":
+            traceback.print_tb(exc.__traceback__)
+        sys.exit(exit_code if "exit_code" in exception else 1)
 
     def __add_argument(self, parser, argument):
         default = argument.get("default")

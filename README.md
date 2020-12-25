@@ -303,6 +303,42 @@ The format string follows the same rules as the Python's [Format String Syntax],
 > Note: These attributes are available to lists, they might not be available to other data types.
 
 
+Exceptions
+----------
+
+Exceptions might occur during execution of a command handle, and `clidesc` does not change the default Python behavior, but allows exceptions to be handled as error messages to the end user.
+
+For example, the following description would print an error message and set the program exit code if the specific exception occurs:
+
+```
+---
+program: calculator
+description: A simple calculator
+version: 1.0
+handler: calculator.compute
+exceptions:
+  - class: ValueError
+    exit_code: 5
+    message: An error occured with message "{exception}".
+arguments:
+  - name: lhs
+    description: Left hand symbol.
+  - name: rhs
+    description: Right hand symbol.
+```
+
+Exception handlers are set globally, in a handler base.
+
+The following attributes can be used when configuring exception handling:
+
+| Name      | Description                                | Default | Required |
+| :-------- | :------------------------------------------| :------ | :------: |
+| class     | The name of the exception class to handle. |    -    |   yes    |
+| action    | The kind of action to take: raise, abort, traceback. | raise | no |
+| exit_code | An integer that will be the program exit code. If explicitly set to a non-zero, force `action` to be `abort`. | 1 | no |
+| message   | A format string to be displayed. It will be formatted with an `exception` object of the raised exception. | - | no |
+
+
 Authors
 -------
 
