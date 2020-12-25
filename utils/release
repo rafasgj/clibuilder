@@ -4,7 +4,7 @@ project="clidesc"
 
 usage() {
 cat << EOF
-usage: release [-h] [-p|-M]
+usage: release [-h|-p|-M]
 
 Bump minor version number and make a release on Github and pypi.
 
