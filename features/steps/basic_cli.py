@@ -95,11 +95,6 @@ def _then_exit_code_is_not_zero(context):
     assert context.exit_code != 0
 
 
-@then("the exit code is zero")
-def _then_exit_code_is_zero(context):
-    assert context.exit_code == 0
-
-
 @then("the exit code is {exit_code:d}")
 def _then_exit_code_is(context, exit_code):
     assert context.exit_code == exit_code, "exit_code: %d / %d" % (
