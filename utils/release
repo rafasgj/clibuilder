@@ -57,6 +57,9 @@ VENV=`echo "import sys; print('yes' if hasattr(sys, 'real_prefix') or sys.base_p
 USER="--user"
 [ "${VENV}" == "yes" ] && USER=""
 
+# install required packages
+python3 -m pip install "$USER" -e "${dir}/..[release]"
+
 # prepare release
 release="${MAJOR}.${MINOR}.${PATCH}"
 sed -i -e "/__version__/s/.*/__version__ = \"${release}\"/" "${version_file}"
