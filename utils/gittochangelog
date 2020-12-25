@@ -2,10 +2,12 @@
 
 if [ -z "$1" ]
 then
-    entries=`git log --pretty=%an:%s --first-parent`
+    from=`git describe --tags $(git rev-list --tags --max-count=1)`
 else
-    entries=`git log "$1"..HEAD --pretty=%an:%s --first-parent`
+    from="$1"
 fi
+
+entries=`git log "$from"..HEAD --pretty=%an:%s --first-parent`
 
 echo "Changes:"
 echo "$entries" | cut -d: -f2- | sed "s/\(.*\)/    \1/"

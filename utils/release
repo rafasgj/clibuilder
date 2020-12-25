@@ -68,7 +68,7 @@ cat <<EOF > "${filename}"
 ${project} release version ${release}
 EOF
 
-"${dir}/gittochangelog" "v${version}" >> "${filename}"
+"${dir}/gittochangelog" >> "${filename}"
 
 # Git release
 git add "${dir}/../clidesc/__init__.py"
