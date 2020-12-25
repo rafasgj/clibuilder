@@ -76,6 +76,7 @@ python3 setup.py sdist bdist_egg
 
 cat <<EOF > "${filename}"
 ${project} release version ${release}
+
 EOF
 
 "${dir}/gittochangelog" >> "${filename}"
