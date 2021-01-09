@@ -56,9 +56,7 @@ def __compare_output(expected, observed):
 
 def __patch_function(context, func_name, impl):
     *module, function = func_name.split(".")
-    context.mock_fun = MagicMock(
-        **{function: MagicMock(side_effect=impl)}
-    )
+    context.mock_fun = MagicMock(**{function: MagicMock(side_effect=impl)})
     sys.modules[".".join(module)] = context.mock_fun
 
 
@@ -156,7 +154,7 @@ def af(context, func, value_type, value):
             "int": int,
             "boolean": bool,
             "bool": bool,
-            "float": float
+            "float": float,
         }
         return types[value_type](value)
 

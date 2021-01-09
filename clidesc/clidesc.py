@@ -52,7 +52,7 @@ class CLIDesc:
         description = cli_description["description"]
         self.__argparse = ArgumentParser(prog=program, description=description)
         if "version" in cli_description:
-            version = cli_description['version']
+            version = cli_description["version"]
             if isinstance(version, dict):
                 *module, attr = version["attribute"].split(".")
                 module = ".".join(module) if module else "builtins"
