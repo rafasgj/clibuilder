@@ -54,6 +54,14 @@ def __compare_output(expected, observed):
     assert observed == expected, msg
 
 
+def __patch_function(context, func_name, impl):
+    *module, function = func_name.split(".")
+    context.mock_fun = MagicMock(
+        **{function: MagicMock(side_effect=impl)}
+    )
+    sys.modules[".".join(module)] = context.mock_fun
+
+
 @given("the CLI description")
 def _given_cli_description(context):
     """Create clidesc from YAML/JSON text data."""
@@ -66,11 +74,7 @@ def _given_a_function_with_one_arg_that_prints(context, func, strfmt):
     def side_effect(**kwargs):
         print(strfmt.format(**kwargs))
 
-    *module, function = func.split(".")
-    context.mock_fun = MagicMock(
-        **{function: MagicMock(side_effect=side_effect)}
-    )
-    sys.modules[".".join(module)] = context.mock_fun
+    __patch_function(context, func, side_effect)
 
 
 @when("the application is executed without prameters")
@@ -120,11 +124,7 @@ def _given_a_function(context, func):
     def side_effect(**kwargs):
         return kwargs
 
-    *module, function = func.split(".")
-    context.mock_fun = MagicMock(
-        **{function: MagicMock(side_effect=side_effect)}
-    )
-    sys.modules[".".join(module)] = context.mock_fun
+    __patch_function(context, func, side_effect)
 
 
 @given('the the CLI description from the file "{filename}"')
@@ -144,3 +144,20 @@ def _given_module_attribute(context, module, attr, value):
     attribute = PropertyMock(return_value=value)
     setattr(type(context.mock_attr), attr, attribute)
     sys.modules[module] = context.mock_attr
+
+
+@given(u'a function that returns "{value}" of type {value_type} named "{func}"')
+def af(context, func, value_type, value):
+    def side_effect(**kwargs):
+        types = {
+            "string": str,
+            "str": str,
+            "integer": int,
+            "int": int,
+            "boolean": bool,
+            "bool": bool,
+            "float": float
+        }
+        return types[value_type](value)
+
+    __patch_function(context, func, side_effect)

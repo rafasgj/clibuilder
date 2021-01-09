@@ -237,8 +237,6 @@ class CLIDesc:
             display_opts = self.__get_display_opts(level, format_cfg, parent)
             if isinstance(data, (str, int)):
                 print(data, file=self.output_stream)
-            if isinstance(data, (str, int)):
-                print(data, file=self.output_stream)
             elif isinstance(data, list):
                 self.__display_list(data, display_opts, parent or "")
             else:

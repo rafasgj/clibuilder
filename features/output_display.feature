@@ -61,6 +61,23 @@ Scenario: Simple unformatted output.
         someone: John
         """
 
+Scenario: Simple string output.
+    Given the CLI description
+        """
+        ---
+        program: greeting
+        description: A greeting application.
+        version: 1.0
+        handler: greeting.hello
+        output: yes
+        """
+        And a function that returns "a string" of type string named "greeting.hello"
+    When the application is executed without prameters
+    Then the output is
+        """
+        a string
+        """
+
 Scenario: Output of a list of values.
     Given the CLI description
         """
