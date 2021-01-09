@@ -19,7 +19,7 @@
 
 import sys
 import io
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, patch, mock_open, PropertyMock
 import yaml
 
 # pylint: disable=import-error, no-name-in-module
@@ -136,3 +136,11 @@ def _given_cli_as_file(context, filename):
         context.exception = error
     else:
         context.exception = None
+
+
+@given('the module "{module}" has attribute "{attr}" with value "{value}"')
+def _given_module_attribute(context, module, attr, value):
+    context.mock_attr = MagicMock()
+    attribute = PropertyMock(return_value=value)
+    setattr(type(context.mock_attr), attr, attribute)
+    sys.modules[module] = context.mock_attr

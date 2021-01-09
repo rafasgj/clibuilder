@@ -339,6 +339,34 @@ The following attributes can be used when configuring exception handling:
 | message   | A format string to be displayed. It will be formatted with an `exception` object of the raised exception. | - | no |
 
 
+Using attributes for `version`
+------------------------------
+
+Often, the program version is available as a module attribute, and
+maintaining this value in more than one place adds a duplication that
+can make the different locations showing different versions. To avoid
+this, `clidesc` supports setting the `version` attribute using an
+attribute of a module. The value will still be bound when the `CLIDesc`
+is created, that is, if the attribute value changes while the program is
+running, it will not be reflected on the CLI.
+
+For example, to define the program version as an attribute, use:
+
+```yaml
+---
+program: greeting
+description: A greeting application.
+version:
+  attribute: greeting.__version__
+```
+
+And the code for `greeting.py` should include, for example:
+
+```
+__version__ = "1.2.0"
+```
+
+
 Project configuration
 ---------------------
 

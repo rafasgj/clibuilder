@@ -74,6 +74,22 @@ Scenario: Application version.
         greeting 1.0
         """
 
+Scenario: Application version as an attribute.
+Given the module "greeting" has attribute "__version__" with value "3.14"
+    And the CLI description
+    """
+    ---
+    program: greeting
+    description: A greeting application.
+    version:
+        attribute: greeting.__version__
+    """
+When the application is executed with [--version]
+Then the output is
+    """
+    greeting 3.14
+    """
+
 Scenario: Help for application with one argument.
     Given the CLI description
         """

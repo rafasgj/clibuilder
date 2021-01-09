@@ -52,11 +52,21 @@ class CLIDesc:
         description = cli_description["description"]
         self.__argparse = ArgumentParser(prog=program, description=description)
         if "version" in cli_description:
+            version = cli_description['version']
+            if isinstance(version, dict):
+                *module, attr = version["attribute"].split(".")
+                module = ".".join(module) if module else "builtins"
+                imp_mod = importlib.import_module(module)
+                if not hasattr(imp_mod, attr):
+                    raise ValueError(
+                        f"Module `{module}` has no attribute `{attr}`"
+                    )
+                version = getattr(imp_mod, attr)
             self.__argparse.add_argument(
                 "--version",
                 action="version",
                 help="display program version",
-                version=f"%(prog)s {cli_description['version']}",
+                version=f"%(prog)s {version}",
             )
 
         self.configuration = Object()
