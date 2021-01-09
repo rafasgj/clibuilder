@@ -25,6 +25,8 @@ import yaml
 # pylint: disable=import-error, no-name-in-module
 from behave import given, when, then
 
+# pylint: enable=import-error, no-name-in-module
+
 from clidesc import CLIDesc
 
 

@@ -21,7 +21,10 @@ import sys
 from importlib import import_module
 from unittest.mock import MagicMock
 
+# pylint: disable=import-error, no-name-in-module
 from behave import given, then
+
+# pylint: enable=import-error, no-name-in-module
 
 
 @given('a function named "{fun_name}" raises {exception}, with message "{msg}"')
