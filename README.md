@@ -339,6 +339,19 @@ The following attributes can be used when configuring exception handling:
 | message   | A format string to be displayed. It will be formatted with an `exception` object of the raised exception. | - | no |
 
 
+Project configuration
+---------------------
+
+When using `clidesc` in your project, if using `yamllint` to verify the CLI
+description file structure, you might want to add the following configuration
+to `.yamllint`:
+
+```
+truthy:
+  allowed-values: [yes, no, true, false, True, False]
+```
+
+
 Authors
 -------
 
