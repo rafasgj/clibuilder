@@ -148,7 +148,7 @@ def _given_module_attribute(context, module, attr, value):
 
 @given(u'a function that returns "{value}" of type {value_type} named "{func}"')
 def _given_function_returning_builtin(context, func, value_type, value):
-    def side_effect(**kwargs):
+    def side_effect(*_args, **_kwargs):
         types = {
             "string": str,
             "str": str,
