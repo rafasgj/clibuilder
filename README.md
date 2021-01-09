@@ -171,13 +171,20 @@ if __name__ == "__main__":
 Output Formatting
 -----------------
 
-> Note: The output formatting is still a "preview" and might change in the near future. Documentation and testing is far from complete. Check [features/output_display.feature] for tested usage examples.
+> Note: The output formatting is still a "preview" and might change in the
+near future. Documentation and testing is far from complete. Check
+[features/output_display.feature] for tested usage examples.
 
-clidesc allows automatic formatting of the command handlers result. To display the returned values, `output` must be set to `yes`, or provide the format and/or format options.
+clidesc allows automatic formatting of the command handlers result. To display
+the returned values, `output` must be set to `yes`, or provide the format
+and/or format options.
 
-The default output formatting will depend on the data type that is returned by the command handler. Strings are written as returned, numbers (int, float and complex) follow standard Python output conventions.
+The default output formatting will depend on the data type that is returned
+by the command handler. Strings are written as returned, numbers (int, float
+    and complex) follow standard Python output conventions.
 
-Lists, tuples and sets are displayed one item per line, with a "dash" before the item:
+Lists, tuples and sets are displayed one item per line, with a "dash" before
+the item:
 
 ```
 - First item
@@ -185,7 +192,8 @@ Lists, tuples and sets are displayed one item per line, with a "dash" before the
 - Third item
 ```
 
-Dictionaries are displayed as `key: value` pairs, but the value will be formatted according to its type, and padded:
+Dictionaries are displayed as `key: value` pairs, but the value will be
+formatted according to its type, and padded:
 
 ```
 a_string: Some text.
@@ -204,7 +212,8 @@ configuring the output formatting, `clidesc` uses Python's
 
 For example, if the result of a handler is the dictionary `{someone: John}`,
 and the output is set to `output: Hello, {someone}.`, the output will be
-`"Hello, John."`. The complete configuration for such an application might be (see [examples/output.py]):
+`"Hello, John."`. The complete configuration for such an application might be
+(see [examples/output.py]):
 
 ```
 ---
@@ -219,7 +228,8 @@ arguments:
     required: true
 ```
 
-Lists can be set to be displayed with the item numbers by setting `enumerate` to `yes` (by default, it is `1`):
+Lists can be set to be displayed with the item numbers by setting `enumerate`
+to `yes` (by default, it is `1`):
 
 ```
 output:
@@ -235,7 +245,8 @@ users:
     3. Jim
 ```
 
-To change the base number of the list, set enumerate to the desired value, for example `enumerate: 0` would result in:
+To change the base number of the list, set enumerate to the desired value,
+for example `enumerate: 0` would result in:
 
 ```
 users:
@@ -244,7 +255,8 @@ users:
     2. Jim
 ```
 
-The list items can also have its format customized, with a format string. To mimic the `enumerate: yes` configuration, the format sting can be defined as:
+The list items can also have its format customized, with a format string. To
+mimic the `enumerate: yes` configuration, the format sting can be defined as:
 
 ```
 output:
@@ -306,9 +318,12 @@ The format string follows the same rules as the Python's [Format String Syntax],
 Exceptions
 ----------
 
-Exceptions might occur during execution of a command handle, and `clidesc` does not change the default Python behavior, but allows exceptions to be handled as error messages to the end user.
+Exceptions might occur during execution of a command handle, and `clidesc`
+does not change the default Python behavior, but allows exceptions to be
+handled as error messages to the end user.
 
-For example, the following description would print an error message and set the program exit code if the specific exception occurs:
+For example, the following description would print an error message and set
+the program exit code if the specific exception occurs:
 
 ```
 ---
@@ -360,7 +375,8 @@ version:
   attribute: greeting.__version__
 ```
 
-And the code for `greeting.py` should include, for example:
+And the code for `greeting.py` (or `greeting/__init__.py`) should include
+the attribute definition, for example:
 
 ```
 __version__ = "1.2.0"
