@@ -10,6 +10,7 @@ clidesc is hosted on [Github](https://github.com) and most of the time,
 you will be using one of Github's features to make a contribution to the
 project, in [clidesc repository](https://github.com/rafasgj/clidesc).
 
+
 Reporting Bugs
 --------------
 
@@ -69,12 +70,19 @@ Once you are willing to contribute code, you must follow a few rules:
 * Your code should pass the linter evaluation, and all existing tests must
   pass.
 
+If contributing code, you might want to use
+[pre-commit](https://pre-commit.com) with the provided configuration, so
+that automatic evaluation of code formatting and linters are executed
+before each commit.
+
+
 ### Code Formatting
 
 clidesc uses `black` for code formatting. The only configuration needed is
 setting up line length to 80 (`-l 80`). If using an editor like Atom or
 VSCode, it is suggested that the editor is configured to format with `black`
 automatically.
+
 
 ### Linters
 
@@ -84,6 +92,7 @@ the linters is found on [setup.cfg](setup.cfg).
 The flake8 linter will use the configured linters in the system. The pylint
 linter will add McCabe extension and compute the cyclomatic complexity for
 the code. Both linters are set for a maximum complexity of 10.
+
 
 ### Testing
 
@@ -111,6 +120,7 @@ goal of the project, complete code coverage does not guarantee that all
 possibilities are covered. Try to be thorough when designing tests for your
 code.
 
+
 ### Pull Requests
 
 To have your code merged to the project repository, you must create a
@@ -125,15 +135,18 @@ how it was fixed, and what it changes in clidesc usage.
 If the pull request was created to fix an open issue, include this
 information in a commit message, by adding "Fix: #<issue number>" to it.
 
+
 ### Development Environment
 
 clidesc uses `setup.cfg` to handle dependencies. It is suggested that the
 development dependencies are installed in a virtual environment, with `pip`,
-using an editable install.
+using an editable install. You should also, install pre-commit hooks.
 
 ```
 python3 -m venv .venv
 . .venv/bin/activate
 pip install --upgrade pip setuptools wheel
 pip install -e .[dev]
+pre-commit install
+pre-commit run --all-files
 ```
