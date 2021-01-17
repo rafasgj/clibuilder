@@ -218,6 +218,8 @@ class CLIDesc:
 
         if "nargs" in argument:
             extra_args["nargs"] = argument["nargs"]
+        if "choices" in argument:
+            extra_args["choices"] = argument["choices"]
 
         if argument.get("configuration"):
             self.__non_parameters.append(

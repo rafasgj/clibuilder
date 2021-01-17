@@ -244,6 +244,39 @@ Scenario: Application with two arguments, one optional.
           --version   display program version
           """
 
+Scenario: Application with an argument with choice value.
+    Given the CLI description
+        """
+        ---
+        program: greeting
+        description: A greeting application.
+        version: 1.0
+        handler: greeting.hello
+        arguments:
+        - name: greet
+          description: A greeting to someone.
+          required: no
+          default: Hello
+          choices:
+            - Hello
+            - Goodbye
+        - name: someone
+          description: Someone to greet.
+          required: yes
+        """
+        And a function "greeting.hello" that prints "{greet}, {someone}!"
+    When the application is executed with [Run, Forest]
+    Then the error output is
+        """
+        usage: greeting [-h] [--version] [{Hello,Goodbye}] someone
+        greeting: error: argument greet: invalid choice: 'Run' (choose from 'Hello', 'Goodbye')
+        """
+    When the application is executed with [Goodbye, John]
+    Then the output is
+        """
+        Goodbye, John!
+        """
+
 Scenario: Application with two arguments, one optional.
     Given the CLI description
         """
