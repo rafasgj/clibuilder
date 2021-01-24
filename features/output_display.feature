@@ -318,3 +318,17 @@ Scenario: Output of a numbered list of values, starting with 0, no padding.
         1. Jack
         2. Jill
         """
+
+Scenario: Output of a handler that returns `None`.
+    Given the CLI description
+        """
+        ---
+        program: greeting
+        description: A greeting application.
+        version: 1.0
+        handler: greeting.hello
+        output: yes
+        """
+        And a function returning nothing, named "greeting.hello"
+    When the application is executed without parameters
+    Then the output is empty

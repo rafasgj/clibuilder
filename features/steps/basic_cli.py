@@ -161,3 +161,17 @@ def _given_function_returning_builtin(context, func, value_type, value):
         return types[value_type](value)
 
     __patch_function(context, func, side_effect)
+
+
+@given('a function returning nothing, named "{func}"')
+def _given_function_return_none(context, func):
+    def side_effect(**_):
+        return None
+
+    __patch_function(context, func, side_effect)
+
+
+@then("the output is empty")
+def _then_output_is_empty(context):
+    __compare_output("", context.stdout.getvalue())
+    context.stdout = io.StringIO()
