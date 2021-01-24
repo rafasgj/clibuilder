@@ -332,3 +332,30 @@ Scenario: Output of a handler that returns `None`.
         And a function returning nothing, named "greeting.hello"
     When the application is executed without parameters
     Then the output is empty
+
+Scenario: Output of a string followed by a list of values, with no key.
+    Given the CLI description
+        """
+        ---
+        program: greeting
+        description: A greeting application.
+        version: 1.0
+        handler: greeting.hello
+        output:
+          string:
+            no_key: yes
+          list:
+            no_key: yes
+        """
+        And a function "greeting.hello", returning:
+        | field  | type   | value         |
+        | string | string | Some value.   |
+        | list   | list   | Jim, Joe, Sam |
+    When the application is executed without parameters
+    Then the output is
+        """
+        Some value.
+        - Jim
+        - Joe
+        - Sam
+        """

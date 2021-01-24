@@ -247,11 +247,13 @@ class CLIDesc:
                     element = ".".join(_parent + [_key])
                     _key = self.__get_display_key(format_cfg, _key)
                     if isinstance(_value, (list, set, dict, tuple)):
-                        print(
-                            f"{display_opts['_pad']}{_key}",
-                            file=self.output_stream,
-                        )
-                        inc = 1 if _key else 0
+                        inc = 0
+                        if _key:
+                            print(
+                                f"{display_opts['_pad']}{_key}",
+                                file=self.output_stream,
+                            )
+                            inc = 1
                         self.__display(_value, level + inc, format_cfg, element)
                     else:
                         print(_key, end=" ", file=self.output_stream)

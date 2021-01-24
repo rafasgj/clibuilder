@@ -175,3 +175,24 @@ def _given_function_return_none(context, func):
 def _then_output_is_empty(context):
     __compare_output("", context.stdout.getvalue())
     context.stdout = io.StringIO()
+
+
+@given('a function "{func}", returning')
+def _given_function_with_return_table(context, func):
+    def create_list(data):
+        return [v.strip() for v in data.split(",")]
+
+    def side_effect(**_):
+        output = {}
+        for row in data_table:
+            types = {
+                "string": str,
+                "str": str,
+                "list": create_list,
+            }
+            rfield, rtype, rvalue = [field.strip() for field in row]
+            output[rfield] = types[rtype](rvalue.strip())
+        return output
+
+    data_table = context.table
+    __patch_function(context, func, side_effect)
