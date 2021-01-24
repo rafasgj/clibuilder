@@ -77,7 +77,7 @@ def _given_a_function_with_one_arg_that_prints(context, func, strfmt):
     __patch_function(context, func, side_effect)
 
 
-@when("the application is executed without prameters")
+@when("the application is executed without parameters")
 def _when_run_application_without_parameters(context):
     __run_application(context, None)
 

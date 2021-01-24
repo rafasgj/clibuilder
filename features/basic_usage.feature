@@ -52,7 +52,7 @@ Scenario: Application with one argument, run without arguments.
             description: Someone to greet.
             required: yes
         """
-    When the application is executed without prameters
+    When the application is executed without parameters
     Then the error output is
         """
         usage: greeting [-h] [--version] someone

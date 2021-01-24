@@ -72,7 +72,7 @@ Scenario: Simple string output.
         output: yes
         """
         And a function that returns "a string" of type string named "greeting.hello"
-    When the application is executed without prameters
+    When the application is executed without parameters
     Then the output is
         """
         a string
