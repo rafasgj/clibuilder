@@ -17,6 +17,7 @@
 
 """Basic CLI test steps."""
 
+import re
 import sys
 import io
 from unittest.mock import MagicMock, patch, mock_open, PropertyMock
@@ -56,6 +57,18 @@ def __compare_output(expected, observed):
     assert observed == expected, msg
 
 
+def __regex_match_output(expected, observed):
+    exp_regex = re.compile(re.escape(expected.strip()))
+    observed = observed.strip()
+    msg = ("Output mismatch: size = %d / %d\n---\n%s\n===\n%s\n---\n") % (
+        len(expected),
+        len(observed),
+        expected,
+        observed,
+    )
+    assert exp_regex.search(observed) is not None, msg
+
+
 def __patch_function(context, func_name, impl):
     *module, function = func_name.split(".")
     context.mock_fun = MagicMock(**{function: MagicMock(side_effect=impl)})
@@ -85,6 +98,14 @@ def _when_run_application_without_parameters(context):
 @then("the output is")
 def _then_output_is(context):
     __compare_output(context.text, context.stdout.getvalue())
+    context.stdout = io.StringIO()
+
+
+@then("the output contains")
+def _then_output_matches(context):
+    stdout = context.stdout.getvalue()
+    for expected in context.text.split("\n"):
+        __regex_match_output(expected, stdout)
     context.stdout = io.StringIO()
 
 

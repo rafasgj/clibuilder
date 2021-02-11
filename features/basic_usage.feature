@@ -104,16 +104,11 @@ Scenario: Help for application with one argument.
             required: yes
         """
     When the application is executed with [--help]
-    Then the output is
+    Then the output contains
         """
         usage: greeting [-h] [--version] someone
-
         A greeting application.
-
-        positional arguments:
           someone     Someone to greet.
-
-        optional arguments:
           -h, --help  show this help message and exit
           --version   display program version
         """
@@ -139,16 +134,11 @@ Scenario: Help for application with a "count" argument, used for configuration.
             optional: yes
         """
     When the application is executed with [--help]
-    Then the output is
+    Then the output contains
         """
         usage: greeting [-h] [--version] [--verbose] someone
-
         A greeting application.
-
-        positional arguments:
           someone        Someone to greet.
-
-        optional arguments:
           -h, --help     show this help message and exit
           --version      display program version
           --verbose, -v  increase verbosity
@@ -196,16 +186,11 @@ Scenario: Application with an optional positional argument.
             required: no
         """
     When the application is executed with [-h]
-    Then the output is
+    Then the output contains
         """
         usage: greeting [-h] [--version] [someone]
-
         A greeting application.
-
-        positional arguments:
           someone     Someone to greet.
-
-        optional arguments:
           -h, --help  show this help message and exit
           --version   display program version
         """
@@ -229,20 +214,15 @@ Scenario: Application with two arguments, one optional.
         """
         And a function "greeting.hello" that prints "{greet}, {someone}!"
     When the application is executed with [--help]
-    Then the output is
+    Then the output contains
         """
         usage: greeting [-h] [--version] [greet] someone
-
         A greeting application.
-
-        positional arguments:
           greet       A greeting to someone.
           someone     Someone to greet.
-
-        optional arguments:
           -h, --help  show this help message and exit
           --version   display program version
-          """
+        """
 
 Scenario: Application with an argument with choice value.
     Given the CLI description

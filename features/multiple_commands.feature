@@ -44,19 +44,14 @@ Scenario: Multiple command help.
                 description: Another argument.
         """
     When the application is executed with [--help]
-    Then the output is
+    Then the output contains
         """
         usage: multi [-h] [--version] Sub commands ...
-
         A multi-command application.
-
-        optional arguments:
           -h, --help    show this help message and exit
           --version     display program version
-
         Commands:
           Application sub-commands
-
           Sub commands
             abc         First command.
             xyz         Second command.
@@ -88,14 +83,10 @@ Scenario: Multiple command, sub-command help.
                 description: Another argument.
         """
     When the application is executed with [abc, --help]
-    Then the output is
+    Then the output contains
         """
         usage: multi abc [-h] [some_arg]
-
-        positional arguments:
           some_arg    Some argument.
-
-        optional arguments:
           -h, --help  show this help message and exit
         """
 
@@ -125,14 +116,10 @@ Scenario: Multiple command, second sub-command help.
                 description: Another argument.
         """
     When the application is executed with [xyz, --help]
-    Then the output is
+    Then the output contains
         """
         usage: multi xyz [-h] [another_arg]
-
-        positional arguments:
           another_arg  Another argument.
-
-        optional arguments:
           -h, --help   show this help message and exit
         """
 
