@@ -233,10 +233,13 @@ class CLIDesc:
         if not isinstance(format_cfg, (str, dict)):
             raise TypeError("Invalid format type: %s" % type(format).__name__)
 
+        display_opts = self.__get_display_opts(level, format_cfg, parent)
         if isinstance(format_cfg, str):
-            print(format_cfg.format(**data), file=self.output_stream)
+            print(
+                format_cfg.format(**data, **display_opts),
+                file=self.output_stream,
+            )
         else:
-            display_opts = self.__get_display_opts(level, format_cfg, parent)
             if isinstance(data, (str, int)):
                 print(data, file=self.output_stream)
             elif isinstance(data, list):
@@ -245,35 +248,47 @@ class CLIDesc:
                 for _key, _value in data.items():
                     _parent = parent.split(".") if parent else []
                     element = ".".join(_parent + [_key])
-                    _key = self.__get_display_key(format_cfg, _key)
+                    disp_key, fmt = self.__get_display_key(format_cfg, _key)
                     if isinstance(_value, (list, set, dict, tuple)):
                         inc = 0
-                        if _key:
+                        if disp_key:
                             print(
-                                f"{display_opts['_pad']}{_key}",
+                                f"{display_opts['_pad']}{disp_key}",
                                 file=self.output_stream,
                             )
                             inc = 1
                         self.__display(_value, level + inc, format_cfg, element)
                     else:
-                        print(_key, end=" ", file=self.output_stream)
-                        print(_value, file=self.output_stream)
+                        print(disp_key, end=" ", file=self.output_stream)
+                        if fmt:
+                            keys = {_key: _value}
+                            keys.update(display_opts)
+                            print(fmt.format(**keys), file=self.output_stream)
+                        else:
+                            print(_value, file=self.output_stream)
 
     @staticmethod
     def __get_display_key(format_cfg, key):
-        if format_cfg.get("no_key", False):
-            return ""
+        fmt = format_cfg.get("format")
+        inner = None
         if key in format_cfg:
             inner = format_cfg[key]
             if isinstance(inner, dict):
+                if "format" in inner:
+                    fmt = inner["format"]
                 if inner.get("no_key", False):
-                    return ""
-        return f"{key}:"
+                    return "", fmt
+        if format_cfg.get("no_key", False):
+            return "", fmt
+        return f"{key}:", fmt
 
     def __display_list(self, data, display_opts, parent):
         for _index, _item in enumerate(data):
             inc = 1
-            _fmt = "{_pad}- {_item}"
+            _fmt = (
+                "{_pad}{theme.list}-{theme.RESET} "
+                "{theme.list_item}{_item}{theme.RESET}"
+            )
             if "__enumerate" in display_opts:
                 _inc = display_opts["__enumerate"]
                 if isinstance(_inc, bool):
@@ -286,7 +301,10 @@ class CLIDesc:
                         "Invalid type for 'enumerate': %s" % type(_inc).__name__
                     )
                 if do_fmt:
-                    _fmt = "{_pad}{_index}. {_item}"
+                    _fmt = (
+                        "{_pad}{theme.list}{_index}.{theme.RESET} "
+                        "{theme.list_item}{_item}{theme.RESET}"
+                    )
             disp_fmt = display_opts.get("__format")
             _fmt = disp_fmt if disp_fmt else _fmt
             _key = parent.split(".")[-1] if parent else ""
@@ -303,22 +321,81 @@ class CLIDesc:
     @staticmethod
     def __get_display_opts(level, format_cfg, parent):
         # get formatting options
-        _fmt = format_cfg
+        if isinstance(format_cfg, str):
+            _fmt = {"format": format_cfg}
+        else:
+            _fmt = format_cfg
         _pad_size = _fmt.get("padding", 4)
+        colorize = _fmt.get("colorize", False)
         if parent:
             for _elem in parent.split("."):
                 if _elem in _fmt:
                     _fmt = _fmt[_elem]
+                    if "colorize" in _fmt:
+                        colorize = _fmt["colorize"]
                 else:
                     break
             if isinstance(_fmt, str):
                 _fmt = {"format": _fmt}
-
         display_opts = {
             "_pad": (" " * (_pad_size * level)) if _pad_size else "",
             "__format": _fmt.get("format"),
-            "__no_key": _fmt.get("no_key"),
+            "__no_key": _fmt.get("no_key", False),
         }
+        display_opts.update(CLIDesc._ansi_color_theme(colorize))
         if "enumerate" in _fmt:
             display_opts["__enumerate"] = _fmt["enumerate"]
         return display_opts
+
+    @staticmethod
+    def _ansi_color_theme(colorize):
+        colors = {
+            "RESET": "\033[0m",
+            "FG_RESET": "\033[39m",
+            "BG_RESET": "\033[49m",
+            "BLACK": "\033[30m",
+            "DARK_GRAY": "\033[90m",
+            "GRAY": "\033[37m",
+            "WHITE": "\033[97m",
+            "DARK_RED": "\033[31m",
+            "DARK_GREEN": "\033[32m",
+            "ORANGE": "\033[33m",
+            "DARK_BLUE": "\033[34m",
+            "DARK_MAGENTA": "\033[35m",
+            "DARK_CYAN": "\033[36m",
+            "RED": "\033[91m",
+            "GREEN": "\033[92m",
+            "YELLOW": "\033[93m",
+            "BLUE": "\033[94m",
+            "MAGENTA": "\033[95m",
+            "CYAN": "\033[96m",
+            "BG_BLACK": "\033[40m",
+            "BG_DARK_GRAY": "\033[100m",
+            "BG_GRAY": "\033[47m",
+            "BG_WHITE": "\033[107m",
+            "BG_DARK_RED": "\033[41m",
+            "BG_DARK_GREEN": "\033[42m",
+            "BG_ORANGE": "\033[43m",
+            "BG_DARK_BLUE": "\033[44m",
+            "BG_DARK_MAGENTA": "\033[45m",
+            "BG_DARK_CYAN": "\033[46m",
+            "BG_RED": "\033[101m",
+            "BG_GREEN": "\033[102m",
+            "BG_YELLOW": "\033[103m",
+            "BG_BLUE": "\033[104m",
+            "BG_CYAN": "\033[106m",
+            "BG_MAGENTA": "\033[105m",
+        }
+        theme = {k: "" for k in ["RESET", "list", "list_item"]}
+        if colorize:
+            theme = {
+                "RESET": "{RESET}",
+                "list": "{WHITE}",
+                "list_item": "",
+            }
+        colors["theme"] = type(
+            "Theme",
+            (object,),
+            {k: v.format(**colors) for k, v in theme.items()},
+        )
+        return colors

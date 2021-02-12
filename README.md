@@ -294,6 +294,7 @@ The attributes available to configure the output are:
 | Name         | Description                            | Default |
 | :----------- | :------------------------------------- | :------ |
 | output       | Set to anything than No or False, will force output. If set to a string, will act as the format string. | No |
+| colorize     | If set to True, colorize output with ANSI color codes. | No |
 | _field name_ | The name of the field to control output formatting. If set to a string, will act as the format string. | None |
 | format       | The formatting string, can be applied to `output` or to a _field_ | Varies for data type. |
 | no_key       | Hide the display of `keys` in dictionaries, if set to `yes`. | No |
@@ -313,6 +314,49 @@ The format string follows the same rules as the Python's [Format String Syntax],
 | _item     | The value of the current list item.                |
 
 > Note: These attributes are available to lists, they might not be available to other data types.
+
+**ANSI Terminal Colors**
+
+To add colors to text output, the following colors are available, as both foreground or background:
+
+* BLACK
+* DARK_GRAY
+* GRAY
+* WHITE
+* DARK_RED
+* DARK_GREEN
+* DARK_BLUE
+* DARK_MAGENTA
+* DARK_CYAN
+* ORANGE
+* RED
+* YELLOW
+* GREEN
+* CYAN
+* BLUE
+* MAGENTA
+
+Also there is the special value `RESET,` which reset all colors to the console default.
+
+So, for example, to print the the list index in bright white (_bold_), and the list items with the default console color, use the following:
+
+```
+output:
+  users:
+    no_key: yes
+    format: "{WHITE}{_pad}{_index}.{RESET} {_item}"
+```
+
+For background colors, prepend the color name with `BG_`. The following example will use bright white for the whole line, but render the item text in a bright red background:
+
+```
+output:
+  users:
+    no_key: yes
+    format: "{WHITE}{_pad}{_index}. {BG_RED}{_item}"
+```
+
+Once the item in rendered, terminal colors are reset to the console default colors.
 
 
 Exceptions

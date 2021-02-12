@@ -28,6 +28,8 @@ from behave import given, when, then
 
 # pylint: enable=import-error, no-name-in-module
 
+from behave_shared import text_compare_error_message
+
 from clidesc import CLIDesc
 
 
@@ -46,27 +48,18 @@ def __run_application(context, params=None):
 
 
 def __compare_output(expected, observed):
+    """Compare expected text output with observed text."""
     expected = expected.strip()
     observed = observed.strip()
-    msg = "Output mismatch: size = %d / %d\n---\n%s\n===\n%s\n---\n" % (
-        len(expected),
-        len(observed),
-        expected,
-        observed,
-    )
-    assert observed == expected, msg
+    assert observed == expected, text_compare_error_message(expected, observed)
 
 
 def __regex_match_output(expected, observed):
     exp_regex = re.compile(re.escape(expected.strip()))
     observed = observed.strip()
-    msg = ("Output mismatch: size = %d / %d\n---\n%s\n===\n%s\n---\n") % (
-        len(expected),
-        len(observed),
-        expected,
-        observed,
+    assert exp_regex.search(observed) is not None, text_compare_error_message(
+        expected, observed
     )
-    assert exp_regex.search(observed) is not None, msg
 
 
 def __patch_function(context, func_name, impl):
@@ -217,3 +210,8 @@ def _given_function_with_return_table(context, func):
 
     data_table = context.table
     __patch_function(context, func, side_effect)
+
+
+@then("no exception is raised")
+def _then_no_exception(context):
+    assert context.exception is None, "Exception: %s" % str(context.exception)

@@ -35,10 +35,11 @@ Scenario: Simple formatted output.
         """
         And a function "greeting.hello"
     When the application is executed with [World]
-    Then the output is
-        """
-        Hello, World!
-        """
+    Then no exception is raised
+        And the output is
+            """
+            Hello, World!
+            """
 
 Scenario: Simple unformatted output.
     Given the CLI description
