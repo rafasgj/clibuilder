@@ -231,7 +231,7 @@ class CLIDesc:
     def __display(self, data, level, format_cfg, parent=None):
         """Display the result of the API command."""
         if not isinstance(format_cfg, (str, dict)):
-            raise TypeError("Invalid format type: %s" % type(format).__name__)
+            raise TypeError(f"Invalid format type: {type(format).__name__}")
 
         display_opts = self.__get_display_opts(level, format_cfg, parent)
         if isinstance(format_cfg, str):
@@ -297,9 +297,8 @@ class CLIDesc:
                     do_fmt = True
                     inc = _inc
                 else:
-                    raise TypeError(
-                        "Invalid type for 'enumerate': %s" % type(_inc).__name__
-                    )
+                    msg = f"Invalid type for 'enumerate': {type(_inc).__name__}"
+                    raise TypeError(msg)
                 if do_fmt:
                     _fmt = (
                         "{_pad}{theme.list}{_index}.{theme.RESET} "

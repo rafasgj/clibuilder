@@ -25,10 +25,10 @@ import yaml
 
 # pylint: disable=import-error, no-name-in-module
 from behave import given, when, then
+from behave_shared import text_compare_error_message
 
 # pylint: enable=import-error, no-name-in-module
 
-from behave_shared import text_compare_error_message
 
 from clidesc import CLIDesc
 
@@ -115,10 +115,9 @@ def _then_exit_code_is_not_zero(context):
 
 @then("the exit code is {exit_code:d}")
 def _then_exit_code_is(context, exit_code):
-    assert context.exit_code == exit_code, "exit_code: %d / %d" % (
-        context.exit_code,
-        exit_code,
-    )
+    assert (
+        context.exit_code == exit_code
+    ), f"exit_code: {context.exit_code:d} / {exit_code:d}"
 
 
 @when("the application is executed with [{param_list}]")
@@ -160,7 +159,7 @@ def _given_module_attribute(context, module, attr, value):
     sys.modules[module] = context.mock_attr
 
 
-@given(u'a function that returns "{value}" of type {value_type} named "{func}"')
+@given('a function that returns "{value}" of type {value_type} named "{func}"')
 def _given_function_returning_builtin(context, func, value_type, value):
     def side_effect(*_args, **_kwargs):
         types = {
@@ -214,4 +213,4 @@ def _given_function_with_return_table(context, func):
 
 @then("no exception is raised")
 def _then_no_exception(context):
-    assert context.exception is None, "Exception: %s" % str(context.exception)
+    assert context.exception is None, f"Exception: {context.exception}"

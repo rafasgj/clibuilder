@@ -20,9 +20,7 @@
 
 def text_compare_error_message(expected, observed):
     """Create an error message for text comparision."""
-    return "Output mismatch: size = %d / %d\n---\n%s\n===\n%s\n---\n" % (
-        len(expected),
-        len(observed),
-        expected,
-        observed,
+    return (
+        f"Output mismatch: size = {len(expected)} / "
+        + f"{len(observed)}\n---\n{expected}\n===\n{observed}\n---\n"
     )

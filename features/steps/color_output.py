@@ -21,10 +21,10 @@ import io
 
 # pylint: disable=import-error, no-name-in-module
 from behave import then
+from behave_shared import text_compare_error_message
 
 # pylint: enable=import-error, no-name-in-module
 
-from behave_shared import text_compare_error_message
 
 from clidesc import CLIDesc
 
